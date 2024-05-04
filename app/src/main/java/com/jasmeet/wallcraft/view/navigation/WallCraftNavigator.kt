@@ -3,20 +3,12 @@ package com.jasmeet.wallcraft.view.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.VerticalShadesClosed
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -25,7 +17,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
+import com.jasmeet.wallcraft.view.screens.CategoriesScreen
 import com.jasmeet.wallcraft.view.screens.HomeScreen
+import com.jasmeet.wallcraft.view.screens.HomeScreenGraph
+import com.jasmeet.wallcraft.view.screens.SearchScreen
+import com.jasmeet.wallcraft.view.screens.SettingsScreen
 import com.jasmeet.wallcraft.view.screens.SplashScreen
 
 const val data = "data"
@@ -44,7 +40,7 @@ fun WallCraftNavigator(
             SplashScreen(navController = navController)
         }
         composable(route = Graph.HOME) {
-            HomeScreen()
+            HomeScreenGraph()
         }
 
     }
@@ -64,24 +60,7 @@ fun HomeNavGraph(navController: NavHostController) {
             enterTransition = { enterTransition() },
             popExitTransition = { exitTransition() }
         ) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Red)
-            ) {
-                IconButton(
-                    onClick = { /*TODO*/ }, modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .statusBarsPadding()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.VerticalShadesClosed,
-                        contentDescription = null
-                    )
-
-                }
-
-            }
+            HomeScreen()
         }
         composable(
             route = BottomBarScreen.Category.route,
@@ -90,19 +69,7 @@ fun HomeNavGraph(navController: NavHostController) {
             enterTransition = { enterTransition() },
             popExitTransition = { exitTransition() }
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Yellow)
-            ) {
-                Button(onClick = {
-                    navController.navigate("${Graph.D}/rambo")
-                }, modifier = Modifier.statusBarsPadding()) {
-                    Text(text = "Wishlist")
-
-                }
-
-            }
+            CategoriesScreen(navController = navController)
         }
         composable(
             route = BottomBarScreen.Search.route,
@@ -111,13 +78,7 @@ fun HomeNavGraph(navController: NavHostController) {
             enterTransition = { enterTransition() },
             popExitTransition = { exitTransition() }
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Cyan)
-            ) {
-
-            }
+            SearchScreen()
         }
 
         composable(
@@ -127,13 +88,7 @@ fun HomeNavGraph(navController: NavHostController) {
             enterTransition = { enterTransition() },
             popExitTransition = { exitTransition() }
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Cyan)
-            ) {
-
-            }
+            SettingsScreen()
         }
 
         composable(route = "${Graph.D}/{data}") { navBackStackEntry ->

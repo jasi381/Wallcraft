@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.secrets.plugin)
+    alias(libs.plugins.kotlinKsp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -30,17 +33,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -71,9 +75,27 @@ dependencies {
     implementation(libs.materialIcons)
 
     // navigation
-
     implementation(libs.androidx.navigation.compose)
-    implementation("com.canopas.intro-showcase-view:introshowcaseview:2.0.1")
-    implementation("com.github.commandiron:ComposeLoading:1.0.4")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation(libs.composeloading)
+    implementation(libs.androidx.constraintlayout.compose)
+
+    //hilt
+    implementation(libs.hiltAndroid)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hiltCompiler)
+    ksp(libs.hiltCompilerKapt)
+
+    //room
+    implementation(libs.room)
+    implementation(libs.roomKtx)
+    ksp(libs.roomCompiler)
+
+    //network
+    implementation(libs.logging.interceptor)
+    implementation(libs.retrofit)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
 }

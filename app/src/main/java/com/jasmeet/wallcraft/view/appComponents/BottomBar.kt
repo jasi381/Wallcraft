@@ -1,5 +1,8 @@
 package com.jasmeet.wallcraft.view.appComponents
 
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +25,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
+import com.jasmeet.wallcraft.view.modifierExtensions.customClickable
 
 
 @Composable
@@ -44,7 +48,7 @@ fun BottomBar(
 
         Surface(
             modifier = Modifier
-                .padding(horizontal = 15.dp)
+                .padding(horizontal = 15.dp, vertical = 8.dp)
                 .fillMaxWidth()
                 .navigationBarsPadding(),
             color = Color(0xff725ffe),
@@ -82,6 +86,11 @@ fun AddBottomNavItem(
 ) {
     val isSelected = currentDestination?.route == screen.route
 
+    val animatedSize by animateDpAsState(
+        targetValue = if (isSelected) 30.dp else 28.dp,
+        animationSpec = tween(500, easing = FastOutLinearInEasing), label = ""
+    )
+
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -101,7 +110,7 @@ fun AddBottomNavItem(
             tint = Color.White,
             modifier = Modifier
                 .padding(vertical = 8.dp)
-                .size(30.dp)
+                .size(animatedSize)
         )
     }
 

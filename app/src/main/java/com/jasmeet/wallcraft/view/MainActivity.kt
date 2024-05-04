@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.jasmeet.wallcraft.view.navigation.WallCraftNavigator
 import com.jasmeet.wallcraft.view.theme.WallcraftTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +41,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

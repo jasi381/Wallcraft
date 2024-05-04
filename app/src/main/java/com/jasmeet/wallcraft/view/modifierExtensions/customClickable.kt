@@ -1,4 +1,4 @@
-package com.jasmeet.wallcraft.view.appComponents
+package com.jasmeet.wallcraft.view.modifierExtensions
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

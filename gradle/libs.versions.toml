@@ -1,16 +1,30 @@
 [versions]
 agp = "8.4.0"
-kotlin = "1.9.0"
-coreKtx = "1.13.0"
+composeloading = "1.0.4"
+constraintlayoutCompose = "1.0.1"
+kotlin = "1.9.23"
+coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.9.0"
-composeBom = "2023.08.00"
+composeBom = "2024.05.00"
 fonts = "1.6.7"
 navigationCompose = "2.7.7"
 material-icons = "1.6.7"
+secrets = "2.0.1"
+room = "2.6.1"
+okhttp = "5.0.0-alpha.12"
+moshiKotlin = "1.15.1"
+retrofit = "2.11.0"
+converterMoshi = "2.11.0"
+hilt-android-compiler = "1.2.0"
+hiltVersion = "2.51.1"
+hiltNavigationCompose = "1.2.0"
+kspVersion = "1.9.23-1.0.20"
+pagingRuntimeKtx = "3.2.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,12 +45,36 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 googleFonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "fonts" }
 materialIcons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material-icons" }
+composeloading = { module = "com.github.commandiron:ComposeLoading", version.ref = "composeloading" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 
 #navigation Compose
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
+#room
+room = { module = "androidx.room:room-runtime", version.ref = "room" }
+roomCompiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+roomKtx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+#retrofit
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
+converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+
+#hilt
+hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
+hiltCompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltVersion" }
+hiltCompilerKapt = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hilt-android-compiler" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
+#Paging
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingRuntimeKtx" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+secrets-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
+hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
+kotlinKsp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
