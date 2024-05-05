@@ -98,4 +98,5 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
