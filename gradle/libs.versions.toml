@@ -1,5 +1,6 @@
 [versions]
 agp = "8.4.0"
+coilCompose = "2.6.0"
 composeloading = "1.0.4"
 constraintlayoutCompose = "1.0.1"
 kotlin = "1.9.23"
@@ -13,6 +14,7 @@ composeBom = "2024.05.00"
 fonts = "1.6.7"
 navigationCompose = "2.7.7"
 material-icons = "1.6.7"
+roomPaging = "2.6.1"
 secrets = "2.0.1"
 room = "2.6.1"
 okhttp = "5.0.0-alpha.12"
@@ -24,6 +26,8 @@ hiltVersion = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 kspVersion = "1.9.23-1.0.20"
 pagingRuntimeKtx = "3.2.1"
+animationCompose = "1.7.0-alpha08"
+foundationCompose = "1.7.0-alpha08"
 
 
 [libraries]
@@ -40,6 +44,8 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animationCompose" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationCompose" }
 
 #Design
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
@@ -47,6 +53,8 @@ googleFonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", ve
 materialIcons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material-icons" }
 composeloading = { module = "com.github.commandiron:ComposeLoading", version.ref = "composeloading" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+
 
 #navigation Compose
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -55,6 +63,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 room = { module = "androidx.room:room-runtime", version.ref = "room" }
 roomCompiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 roomKtx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomPaging" }
 
 #retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }

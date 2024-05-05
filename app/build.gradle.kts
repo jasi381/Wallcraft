@@ -62,7 +62,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,8 +71,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //Design
+    implementation(libs.androidx.material3)
     implementation(libs.googleFonts)
     implementation(libs.materialIcons)
+
+    //shared Transition
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.foundation)
+
 
     // navigation
     implementation(libs.androidx.navigation.compose)
@@ -89,6 +96,7 @@ dependencies {
     implementation(libs.room)
     implementation(libs.roomKtx)
     ksp(libs.roomCompiler)
+    implementation(libs.androidx.room.paging)
 
     //network
     implementation(libs.logging.interceptor)
@@ -98,5 +106,5 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.coil.compose)
 }

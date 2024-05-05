@@ -7,15 +7,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
 import com.jasmeet.wallcraft.view.screens.CategoriesScreen
 import com.jasmeet.wallcraft.view.screens.HomeScreen
@@ -60,7 +67,7 @@ fun HomeNavGraph(navController: NavHostController) {
             enterTransition = { enterTransition() },
             popExitTransition = { exitTransition() }
         ) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
         composable(
             route = BottomBarScreen.Category.route,
@@ -100,7 +107,17 @@ fun HomeNavGraph(navController: NavHostController) {
                     .background(Color.DarkGray)
             ) {
                 Spacer(modifier = Modifier.height(70.dp))
-                Text(text = data.toString())
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(data)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.img_placeholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.clip(MaterialTheme.shapes.large)
+
+                )
             }
         }
     }
@@ -115,7 +132,7 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition() 
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.exitTransition() =
     slideOutOfContainer(
-        AnimatedContentTransitionScope.SlideDirection.Down, tween(700)
+        AnimatedContentTransitionScope.SlideDirection.End, tween(700)
     )
 
 

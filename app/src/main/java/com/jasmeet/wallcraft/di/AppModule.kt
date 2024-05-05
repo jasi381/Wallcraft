@@ -1,6 +1,10 @@
 package com.jasmeet.wallcraft.di
 
+import android.content.Context
+import androidx.room.Room
 import com.jasmeet.wallcraft.model.apiService.ApiService
+import com.jasmeet.wallcraft.model.dao.PhotosDao
+import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.HomeRepo
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
 import com.squareup.moshi.Moshi
@@ -8,6 +12,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -45,6 +50,20 @@ object AppModule {
             .client(okHttpClient)
             .build()
             .create(ApiService::class.java)
+    }
+
+    @Provides
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "Photos_Database"
+        ).build()
+    }
+
+    @Provides
+    fun providePostDao(database: AppDatabase): PhotosDao {
+        return database.photoDao()
     }
 
     @Provides

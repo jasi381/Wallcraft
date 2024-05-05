@@ -26,6 +26,9 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow(PagingData.empty())
     val homeData = _homeData.asStateFlow()
 
+    private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
+    val error = _error.asStateFlow()
+
     fun loadData() {
         viewModelScope.launch {
             try {
@@ -43,6 +46,7 @@ class HomeViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 // Handle the exception here
+                _error.value = e.message
                 Log.e("HomeViewModel", "Error loading data: ${e.message}", e)
             }
         }
