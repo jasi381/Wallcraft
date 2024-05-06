@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WallcraftTheme {
                 WallCraftNavigator(navController = rememberNavController())
+
             }
         }
     }

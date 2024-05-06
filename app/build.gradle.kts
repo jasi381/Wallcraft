@@ -75,6 +75,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.googleFonts)
     implementation(libs.materialIcons)
+    implementation(libs.lottie)
+    implementation(libs.lottie)
 
     //shared Transition
     implementation(libs.androidx.animation)

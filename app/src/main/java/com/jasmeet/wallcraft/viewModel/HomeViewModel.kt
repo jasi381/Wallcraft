@@ -1,5 +1,10 @@
 package com.jasmeet.wallcraft.viewModel
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +15,9 @@ import androidx.paging.cachedIn
 import com.jasmeet.wallcraft.model.apiResponse.remote.Photo
 import com.jasmeet.wallcraft.model.pagingSource.HomePagingSource
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -19,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepo: HomeRepo
+    private val homeRepo: HomeRepo,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _homeData: MutableStateFlow<PagingData<Photo>> =
@@ -29,7 +37,20 @@ class HomeViewModel @Inject constructor(
     private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
     val error = _error.asStateFlow()
 
-    fun loadData() {
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            loadData()
+        }
+
+        override fun onLost(network: Network) {
+            _error.value = "No Internet Connection"
+        }
+    }
+
+    private fun loadData() {
         viewModelScope.launch {
             try {
                 Pager(
@@ -43,6 +64,7 @@ class HomeViewModel @Inject constructor(
                     .cachedIn(viewModelScope)
                     .collectLatest { filteredNowPlayingMovies ->
                         _homeData.value = filteredNowPlayingMovies
+                        _error.value = null // Reset error state on successful data load
                     }
             } catch (e: Exception) {
                 // Handle the exception here
@@ -53,6 +75,21 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
-        loadData()
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+
+        // Check initial network state
+        if (Utils.isNetworkAvailable(context)) {
+            loadData()
+        } else {
+            _error.value = "No Internet Connection"
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

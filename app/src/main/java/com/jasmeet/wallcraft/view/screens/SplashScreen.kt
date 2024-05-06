@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringExample
@@ -27,7 +28,10 @@ fun SplashScreen(modifier: Modifier = Modifier, navController: NavHostController
 
     LaunchedEffect(key1 = Unit) {
         delay(2500)
-        navController.navigate(Graph.HOME)
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(Graph.SPLASH, inclusive = true)
+            .build()
+        navController.navigate(Graph.HOME, navOptions)
     }
 
 

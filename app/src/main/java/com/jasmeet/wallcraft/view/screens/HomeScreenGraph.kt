@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.view.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -10,15 +11,19 @@ import com.jasmeet.wallcraft.view.navigation.HomeNavGraph
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreenGraph(navController: NavHostController = rememberNavController()) {
-    Scaffold(
-        topBar = {
-        },
-        bottomBar = {
-            BottomBar(navController = navController)
-        }
-    ) {
-        HomeNavGraph(navController = navController)
-    }
+fun HomeScreenGraph(
+    navController: NavHostController = rememberNavController(),
+) {
 
+
+    Box {
+        Scaffold(
+            bottomBar = {
+                BottomBar(navController = navController)
+            }
+        ) {
+            HomeNavGraph(navController = navController)
+        }
+    }
 }
+
