@@ -21,17 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.jasmeet.wallcraft.R
+import com.jasmeet.wallcraft.view.appComponents.NetworkImage
 import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.viewModel.HomeViewModel
 import java.net.URLEncoder
@@ -99,14 +94,9 @@ fun SharedTransitionScope.HomeScreen(
 
                     val encodedUrl = URLEncoder.encode(data[index]?.src?.portrait, "UTF-8")
 
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(data[index]?.src?.portrait)
-                            .crossfade(true)
-                            .build(),
-                        placeholder = painterResource(R.drawable.img_placeholder),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                    NetworkImage(
+                        url = data[index]?.src?.portrait.toString(),
+                        enableCrossFade = true,
                         modifier = Modifier
                             .sharedElement(
                                 state = rememberSharedContentState(
@@ -117,8 +107,14 @@ fun SharedTransitionScope.HomeScreen(
                             .height(LocalConfiguration.current.screenWidthDp.dp * 2 / 3f)
                             .clip(MaterialTheme.shapes.large)
                             .clickable {
-                                onImageClicked(Pair(encodedUrl, data[index]?.id.toString()))
+                                onImageClicked(
+                                    Pair(
+                                        encodedUrl,
+                                        data[index]?.photographer.toString()
+                                    )
+                                )
                             }
+
                     )
                 }
             }

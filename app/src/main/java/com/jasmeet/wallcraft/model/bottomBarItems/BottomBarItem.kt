@@ -30,6 +30,4 @@ sealed class BottomBarScreen(
         selectedIcon = R.drawable.ic_setting_selected,
         unselectedIcon = R.drawable.ic_setting_unselected,
     )
-
-
 }

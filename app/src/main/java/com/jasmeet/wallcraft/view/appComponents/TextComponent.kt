@@ -1,5 +1,6 @@
 package com.jasmeet.wallcraft.view.appComponents
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ import com.jasmeet.wallcraft.view.theme.pridi
 fun TextComponent(
     modifier: Modifier = Modifier,
     text: String,
-    textColor: Color = Color.Black,
+    textColor: Color = MaterialTheme.colorScheme.onBackground,
     textSize: TextUnit = 18.sp,
     fontFamily: FontFamily = pridi,
     fontWeight: FontWeight = FontWeight.Normal,

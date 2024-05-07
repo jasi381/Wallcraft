@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.googleFonts)
     implementation(libs.materialIcons)
     implementation(libs.lottie)
-    implementation(libs.lottie)
+    implementation("com.github.skydoves:balloon-compose:1.6.4")
 
     //shared Transition
     implementation(libs.androidx.animation)

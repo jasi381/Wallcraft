@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.jasmeet.wallcraft.model.WallpaperType
 import com.jasmeet.wallcraft.view.navigation.WallCraftNavigator
 import com.jasmeet.wallcraft.view.theme.WallcraftTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,7 +95,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     }
 }
 
-private suspend fun loadImageFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
+suspend fun loadImageFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
     try {
         val url1 = URL(url)
         val connection: HttpURLConnection = url1.openConnection() as HttpURLConnection
@@ -108,7 +109,7 @@ private suspend fun loadImageFromUrl(url: String): Bitmap? = withContext(Dispatc
     }
 }
 
-private suspend fun setWallpaper(bitmap: Bitmap?, context: Context) = withContext(Dispatchers.IO) {
+suspend fun setWallpaper(bitmap: Bitmap?, context: Context) = withContext(Dispatchers.IO) {
     if (bitmap != null) {
         val wallpaperManager = WallpaperManager.getInstance(context)
         try {
@@ -186,13 +187,8 @@ fun Greeting2(name: String, modifier: Modifier = Modifier) {
     }
 }
 
-enum class WallpaperType {
-    HOME_SCREEN,
-    LOCK_SCREEN,
-    BOTH
-}
 
-private suspend fun setWallpaper2(bitmap: Bitmap?, context: Context, wallpaperType: WallpaperType) {
+suspend fun setWallpaper2(bitmap: Bitmap?, context: Context, wallpaperType: WallpaperType) {
     if (bitmap != null) {
         val wallpaperManager = WallpaperManager.getInstance(context)
         try {
@@ -215,6 +211,7 @@ private suspend fun setWallpaper2(bitmap: Bitmap?, context: Context, wallpaperTy
                     wallpaperManager.setBitmap(bitmap)
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
                 }
+                else -> {}
             }
         } catch (e: IOException) {
             e.printStackTrace()

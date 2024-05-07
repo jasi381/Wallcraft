@@ -12,12 +12,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jasmeet.wallcraft.R
 
 @Composable
-fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit) {
+fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
 
     FilledTonalIconButton(
         onClick = {
@@ -28,7 +26,8 @@ fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit) {
             containerColor = Color(
                 MaterialTheme.colorScheme.background.copy(alpha = 0.4f).toArgb()
             )
-        )
+        ),
+        modifier = modifier
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = icon),
@@ -41,9 +40,3 @@ fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit) {
 
 }
 
-@Preview
-@Composable
-private fun Icon() {
-    IconTonalButtonComponent(icon = R.drawable.ic_download) {}
-
-}
