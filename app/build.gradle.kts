@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.runtime.livedata)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -76,7 +77,6 @@ dependencies {
     implementation(libs.googleFonts)
     implementation(libs.materialIcons)
     implementation(libs.lottie)
-    implementation("com.github.skydoves:balloon-compose:1.6.4")
 
     //shared Transition
     implementation(libs.androidx.animation)

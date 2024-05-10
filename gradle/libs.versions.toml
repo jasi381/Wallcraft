@@ -29,6 +29,7 @@ kspVersion = "1.9.23-1.0.20"
 pagingRuntimeKtx = "3.2.1"
 animationCompose = "1.7.0-alpha08"
 foundationCompose = "1.7.0-alpha08"
+runtimeLivedata = "1.6.7"
 
 
 [libraries]
@@ -47,6 +48,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animationCompose" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationCompose" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 
 #Design
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }

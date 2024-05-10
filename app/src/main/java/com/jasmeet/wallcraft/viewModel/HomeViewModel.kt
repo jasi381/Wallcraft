@@ -67,7 +67,7 @@ class HomeViewModel @Inject constructor(
                         _error.value = null // Reset error state on successful data load
                     }
             } catch (e: Exception) {
-                // Handle the exception here
+                // Handled the exception here
                 _error.value = e.message
                 Log.e("HomeViewModel", "Error loading data: ${e.message}", e)
             }
@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
             .build()
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
 
-        // Check initial network state
+        // Checking initial network state
         if (Utils.isNetworkAvailable(context)) {
             loadData()
         } else {

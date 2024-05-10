@@ -18,4 +18,12 @@ interface ApiService {
         @Query("page") page: Int,
         @Header("Authorization") auth_token: String = AUTH_TOKEN
     ): ApiResponse
+
+
+    @GET("search?per_page=50")
+    suspend fun getSearchScreenData(
+        @Query("page") page: Int,
+        @Header("Authorization") auth_token: String = AUTH_TOKEN,
+        @Query("query") query: String
+    ): ApiResponse
 }

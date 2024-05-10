@@ -6,7 +6,9 @@ import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.model.repo.SearchRepo
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.SearchRepoImpl
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -70,4 +72,9 @@ object AppModule {
     @Singleton
     fun providesHomeRepo(apiService: ApiService): HomeRepo =
         HomeRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun providesSearchRepo(apiService: ApiService): SearchRepo =
+        SearchRepoImpl(apiService)
 }

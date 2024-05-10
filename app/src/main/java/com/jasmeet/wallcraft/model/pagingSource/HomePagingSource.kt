@@ -32,7 +32,13 @@ class HomePagingSource @Inject constructor(
             return LoadResult.Error(e)
         } catch (e: HttpException) {
             // HTTP exceptions
-            return LoadResult.Error(e)
+            if (e.code() == 525) {
+                // Handle HTTP 525 error
+                return LoadResult.Error(e)
+            } else {
+                // Handle other HTTP exceptions
+                return LoadResult.Error(e)
+            }
         } catch (e: Exception) {
             // Catch any other exceptions
             return LoadResult.Error(e)
