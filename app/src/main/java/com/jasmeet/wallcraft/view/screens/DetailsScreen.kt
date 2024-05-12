@@ -37,6 +37,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.WallpaperType
 import com.jasmeet.wallcraft.model.apiResponse.local.DownloadEntity
@@ -66,6 +68,7 @@ import com.jasmeet.wallcraft.view.appComponents.NetworkImage
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
 import com.jasmeet.wallcraft.view.loadImageFromUrl
 import com.jasmeet.wallcraft.view.setWallpaper2
+import com.jasmeet.wallcraft.viewModel.DetailsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -80,8 +83,18 @@ fun SharedTransitionScope.DetailsScreen(
     data: String?,
     onBackClick: () -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
-    id: String?
+    id: String?,
+    detailsViewModel: DetailsViewModel = hiltViewModel()
 ) {
+
+    val details = detailsViewModel.details.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        id?.let { detailsViewModel.getDetails(it) }
+
+    }
+
+
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
 

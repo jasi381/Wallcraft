@@ -12,7 +12,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import com.jasmeet.wallcraft.model.pagingSource.HomePagingSource
 import com.jasmeet.wallcraft.model.repo.HomeRepo
@@ -22,7 +21,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -77,11 +76,7 @@ class HomeViewModel @Inject constructor(
                     pagingSourceFactory = {HomePagingSource(homeRepo)}
                 ).flow
                     .cachedIn(viewModelScope)
-                    .map { list ->
-                        list.filter {
-                            it.id != null && it.id.isNotEmpty()
-                        }
-                    }
+                    .distinctUntilChanged()
                     .collectLatest {
                         _homeData.value = it
                         _error.value = null

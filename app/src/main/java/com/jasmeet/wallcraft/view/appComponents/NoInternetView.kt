@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.jasmeet.wallcraft.R
 
 @Composable
-fun NoInternetView() {
+fun NoInternetView(error: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,17 +32,17 @@ fun NoInternetView() {
         )
         Spacer(modifier = Modifier.height(14.dp))
         TextComponent(
-            text = "No Internet Connection!",
-            textSize = 22.sp,
+            text = error,
+            textSize = 20.sp,
             fontWeight = FontWeight.Bold,
             textColor = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(5.dp))
-        TextComponent(
-            text = "Please check your internet connection",
-            textSize = 16.sp,
-            textColor = MaterialTheme.colorScheme.onBackground,
-        )
+//        TextComponent(
+//            text = "Please check your internet connection",
+//            textSize = 16.sp,
+//            textColor = MaterialTheme.colorScheme.onBackground,
+//        )
 
     }
 }

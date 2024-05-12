@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.jasmeet.wallcraft.model.apiResponse.local.DownloadEntity
 import com.jasmeet.wallcraft.model.dao.DownloadDao
 
-@Database(entities = [DownloadEntity::class], version = 1)
+@Database(entities = [DownloadEntity::class], version = 1, exportSchema = false)
 abstract class DownloadsDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao
 

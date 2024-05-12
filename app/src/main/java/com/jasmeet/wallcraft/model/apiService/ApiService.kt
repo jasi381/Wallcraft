@@ -1,13 +1,10 @@
 package com.jasmeet.wallcraft.model.apiService
 
-import androidx.paging.PagingData
 import com.jasmeet.wallcraft.BuildConfig
-import com.jasmeet.wallcraft.model.apiResponse.remote.ApiResponse
+import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
-import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.Urls
-import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
-import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -17,16 +14,19 @@ interface ApiService {
     }
 
 
-    @GET("photos/?client_id=$CLIENT_ID&order_by=latest&per_page=20")
+    @GET("photos")
     suspend fun getHomeScreenData(
         @Query("page") page: Int,
+        @Query("per_page") perPage: Int = 20,
+        @Query("order_by") orderBy: String = "latest",
+        @Query("client_id") clientId: String = CLIENT_ID,
     ): List<HomeApiResponse>
 
+    @GET("photos/{id}")
+    suspend fun getWallpaperDetails(
+        @Path("id") id: String,
+        @Query("client_id") clientId: String = CLIENT_ID,
+    ): DetailsApiResponse
 
-    @GET("search?per_page=50")
-    suspend fun getSearchScreenData(
-        @Query("page") page: Int,
-        @Header("Authorization") auth_token: String = CLIENT_ID,
-        @Query("query") query: String
-    ): ApiResponse
+
 }

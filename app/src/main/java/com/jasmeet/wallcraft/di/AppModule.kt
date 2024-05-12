@@ -5,10 +5,10 @@ import androidx.room.Room
 import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
+import com.jasmeet.wallcraft.model.repo.DetailsRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
-import com.jasmeet.wallcraft.model.repo.SearchRepo
+import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
-import com.jasmeet.wallcraft.model.repoImpl.SearchRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,6 +67,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesSearchRepo(apiService: ApiService): SearchRepo =
-        SearchRepoImpl(apiService)
+    fun providesDetailsRepo(apiService: ApiService): DetailsRepo =
+        DetailsRepoImpl(apiService)
 }

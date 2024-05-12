@@ -117,7 +117,7 @@ fun SharedTransitionScope.HomeScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            NoInternetView()
+            NoInternetView(error = error.value!!)
         }
     } else {
         Box(
