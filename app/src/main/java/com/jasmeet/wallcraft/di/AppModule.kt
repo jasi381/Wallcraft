@@ -9,8 +9,6 @@ import com.jasmeet.wallcraft.model.repo.HomeRepo
 import com.jasmeet.wallcraft.model.repo.SearchRepo
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.SearchRepoImpl
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +17,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -28,13 +26,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideMoshi(): Moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideApiService(moshi: Moshi): ApiService {
+    fun provideApiService(): ApiService {
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -48,7 +40,7 @@ object AppModule {
 
         return Retrofit.Builder()
             .baseUrl(ApiService.BASE_URL)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
             .create(ApiService::class.java)

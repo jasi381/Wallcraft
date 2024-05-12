@@ -103,10 +103,9 @@ dependencies {
     //network
     implementation(libs.logging.interceptor)
     implementation(libs.retrofit)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.retrofit)
-    implementation(libs.converter.moshi)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.compose)
+    implementation (libs.converter.gson)
+
 }
