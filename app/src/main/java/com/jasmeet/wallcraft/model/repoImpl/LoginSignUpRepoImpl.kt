@@ -35,4 +35,7 @@ class LoginSignUpRepoImpl(
             )
         ).await()
     }
+    override suspend fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email).await()
+    }
 }

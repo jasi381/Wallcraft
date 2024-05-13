@@ -6,4 +6,5 @@ interface LoginSignUpRepo {
     suspend fun loginWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun signUpWithEmailAndPassword(email: String, password: String): AuthResult
     suspend fun saveUserInfo(authResult: AuthResult)
+    suspend fun sendPasswordResetEmail(email: String)
 }

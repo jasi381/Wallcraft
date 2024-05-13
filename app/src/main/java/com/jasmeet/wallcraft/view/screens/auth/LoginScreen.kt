@@ -80,7 +80,6 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-
     val token = stringResource(R.string.default_web_client_id)
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -195,7 +194,10 @@ fun LoginScreen(
 
             TextButton(
                 onClick = {
-                    navController.navigate(AuthScreen.Forgot.route)
+                    val navOptions = NavOptions.Builder()
+                        .setPopUpTo(AuthScreen.Login.route, inclusive = true)
+                        .build()
+                    navController.navigate(AuthScreen.Forgot.route, navOptions)
                 },
                 modifier = Modifier
                     .align(Alignment.End)

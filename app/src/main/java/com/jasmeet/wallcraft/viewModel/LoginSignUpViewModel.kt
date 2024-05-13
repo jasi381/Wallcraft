@@ -81,6 +81,20 @@ class LoginSignUpViewModel @Inject constructor(
         }
     }
 
+    fun resetPassword(email: String, onResetPassword: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                repository.sendPasswordResetEmail(email)
+                _isLoading.value = false
+                onResetPassword()
+            } catch (e: Exception) {
+                setErrorMessage(e.message)
+                _isLoading.value = false
+            }
+        }
+    }
+
     //This function will only be used when user tries to sign in with google
     fun saveData(authResult: AuthResult) {
         viewModelScope.launch {
