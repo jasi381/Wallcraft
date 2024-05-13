@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Patterns
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.URL
@@ -26,6 +27,14 @@ object Utils {
             else -> false
         }
 
+    }
+
+    fun validateEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun validatePassword(password: String): Boolean {
+        return password.length >= 8
     }
 
     fun getBitmapFromUrl(url: String): Bitmap? {

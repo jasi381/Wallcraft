@@ -2,13 +2,17 @@ package com.jasmeet.wallcraft.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.DetailsRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.model.repo.LoginSignUpRepo
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.LoginSignUpRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,9 +28,28 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object AppModule {
+
     @Provides
     @Singleton
-    fun provideApiService(): ApiService {
+    fun providesFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun providesFirebaseDatabase(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    fun providesUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): LoginSignUpRepo {
+        return LoginSignUpRepoImpl(auth, db)
+    }
+
+
+    @Provides
+    @Singleton
+    fun providesApiService(): ApiService {
 
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -47,7 +70,7 @@ object AppModule {
     }
 
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun providesLocalDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
@@ -56,7 +79,7 @@ object AppModule {
     }
 
     @Provides
-    fun providePostDao(database: AppDatabase): PhotosDao {
+    fun providesPostDao(database: AppDatabase): PhotosDao {
         return database.photoDao()
     }
 

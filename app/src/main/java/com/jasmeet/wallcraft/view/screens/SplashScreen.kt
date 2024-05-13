@@ -19,8 +19,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
-import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringExample
-import com.jasmeet.wallcraft.view.navigation.Graph
+import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
+import com.jasmeet.wallcraft.view.navigation.graphs.AuthScreen
 import kotlinx.coroutines.delay
 
 @Composable
@@ -29,9 +29,9 @@ fun SplashScreen(modifier: Modifier = Modifier, navController: NavHostController
     LaunchedEffect(key1 = Unit) {
         delay(2500)
         val navOptions = NavOptions.Builder()
-            .setPopUpTo(Graph.SPLASH, inclusive = true)
+            .setPopUpTo(AuthScreen.SplashScreen.route, inclusive = true)
             .build()
-        navController.navigate(Graph.HOME, navOptions)
+        navController.navigate(AuthScreen.Login.route, navOptions)
     }
 
 
@@ -73,7 +73,7 @@ fun SplashScreen(modifier: Modifier = Modifier, navController: NavHostController
             color = Color.White,
         )
 
-        AnnotatedStringExample(
+        AnnotatedStringComponent(
             text = "Created By ",
             subText = "Jasmeet Singh",
             subTextSize = 18.sp,

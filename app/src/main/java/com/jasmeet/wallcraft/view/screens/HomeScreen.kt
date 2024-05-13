@@ -49,50 +49,6 @@ fun SharedTransitionScope.HomeScreen(
     val error = homeViewModel.error.collectAsState()
     val context = LocalContext.current
 
-//    Column(Modifier.fillMaxSize()) {
-//        Button(
-//            colors = ButtonDefaults.buttonColors(
-//                containerColor = Color.Blue,
-//                contentColor = Color.White
-//            ),
-//            onClick = {
-//                Log.d("Response", data.toString())
-//            },
-//            modifier = Modifier
-//                .align(Alignment.Start)
-//                .statusBarsPadding()
-//        ) {
-//            Text(text = "Load More")
-//        }
-//
-//        LazyColumn(
-//            Modifier
-//                .fillMaxSize()
-//                .weight(1f)) {
-//            items(data.itemCount){index ->
-//                AsyncImage(
-//                    model = data[index]?.urls?.full,
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .padding(10.dp)
-//                        .size(100.dp, 190.dp)
-//                        .clickable {
-//                                   Log.d("Id", data[index]?.id.toString())
-//                            Log.d("Id-Desc", data[index]?.altDescription.toString())
-//                        },
-//                    contentScale = ContentScale.FillBounds,
-//                    placeholder = painterResource(id = R.drawable.img_placeholder)
-//                )
-//
-//
-//            }
-//
-//        }
-//
-//    }
-
-
-
     //TODO: Hide the bottom navigation bar on scroll Down and show it on scroll Up & None
 
 //    val lazyListState = rememberLazyStaggeredGridState()

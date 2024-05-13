@@ -31,3 +31,10 @@ val pridi = FontFamily(
         fontProvider = provider,
     )
 )
+
+val poppins = FontFamily(
+    androidx.compose.ui.text.googlefonts.Font(
+        googleFont = GoogleFont("Poppins"),
+        fontProvider = provider,
+    )
+)

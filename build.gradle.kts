@@ -5,4 +5,10 @@ plugins {
     alias(libs.plugins.secrets.plugin) apply false
     alias(libs.plugins.hiltAndroid) apply false
     alias(libs.plugins.kotlinKsp) apply false
+    alias(libs.plugins.gmsService) apply false
+}
+buildscript {
+    dependencies {
+        classpath(libs.google.services)
+    }
 }

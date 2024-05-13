@@ -30,7 +30,7 @@ fun CategoriesScreen(modifier: Modifier = Modifier, navController: NavHostContro
             textColor = MaterialTheme.colorScheme.onBackground
         )
         Button(onClick = {
-            navController.navigate("${Graph.D}/rambo")
+            navController.navigate("${Graph.DETAILS}/rambo")
         }, modifier = Modifier.statusBarsPadding()) {
             Text(text = "Wishlist", color = MaterialTheme.colorScheme.onBackground)
 
