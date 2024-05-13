@@ -41,6 +41,7 @@ fun InputFieldComponent(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
             errorContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground.copy(0.5f),
             cursorColor = MaterialTheme.colorScheme.onBackground,

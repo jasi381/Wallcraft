@@ -54,13 +54,14 @@ fun PassWordTextFieldComponent(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
             errorContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground.copy(0.5f),
             cursorColor = MaterialTheme.colorScheme.onBackground,
             selectionColors = TextSelectionColors(
                 handleColor = MaterialTheme.colorScheme.onBackground,
                 backgroundColor = Color.Blue.copy(0.5f)
-            )
+            ),
         ),
         keyboardActions = KeyboardActions(
             onDone = {

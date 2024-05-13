@@ -57,8 +57,6 @@ import com.jasmeet.wallcraft.view.navigation.Graph
 import com.jasmeet.wallcraft.view.navigation.graphs.AuthScreen
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -120,7 +118,7 @@ fun LoginScreen(
     LaunchedEffect(errorMessage) {
         if (errorMessage?.isNotEmpty() == true) {
             scope.launch {
-                snackbarHostState.showSnackbar(errorMessage!!)
+                snackbarHostState.showSnackbar(errorMessage ?: "Something went wrong!")
             }
         }
     }
@@ -191,7 +189,7 @@ fun LoginScreen(
                 onDone = {
                     keyboardController?.hide()
                     focusManager.clearFocus()
-
+                    validateAndInitiateLogin(email, password, loginSignUpViewModel, navController)
                 }
             )
 
@@ -282,8 +280,17 @@ private fun validateAndInitiateLogin(
     navController: NavHostController
 ) {
     if (Utils.validateEmail(email) && Utils.validatePassword(password)) {
-        loginSignUpViewModel.loginWithEmailPassword(email, password)
-        initiateLoginInFlow(loginSignUpViewModel, navController)
+        loginSignUpViewModel.loginWithEmailPassword(
+            email = email,
+            password,
+            onLogin = {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(AuthScreen.Login.route, inclusive = true)
+                    .build()
+                navController.navigate(Graph.HOME, navOptions)
+            }
+        )
+
     } else if (email.isEmpty()) {
         loginSignUpViewModel.setErrorMessage("Email is Empty")
     } else if (password.isEmpty()) {
@@ -296,20 +303,3 @@ private fun validateAndInitiateLogin(
 
 }
 
-private fun initiateLoginInFlow(
-    loginSignUpViewModel: LoginSignUpViewModel,
-    navController: NavHostController
-) {
-
-    CoroutineScope(Dispatchers.Main).launch {
-        loginSignUpViewModel.stateFlow.collect {
-            if (it) {
-                val navOptions = NavOptions.Builder()
-                    .setPopUpTo(AuthScreen.Login.route, inclusive = true)
-                    .build()
-                navController.navigate(Graph.HOME, navOptions)
-            }
-        }
-
-    }
-}

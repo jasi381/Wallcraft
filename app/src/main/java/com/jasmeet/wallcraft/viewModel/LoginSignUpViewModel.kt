@@ -29,9 +29,6 @@ class LoginSignUpViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val state = MutableStateFlow(false)
-    val stateFlow: StateFlow<Boolean> = state
-
     init {
         viewModelScope.launch {
             while (true) {
@@ -53,7 +50,7 @@ class LoginSignUpViewModel @Inject constructor(
         }
     }
 
-    fun signUpEmailPassword(email: String, password: String) {
+    fun signUpEmailPassword(email: String, password: String, onSignUp: () -> Unit) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
@@ -61,27 +58,25 @@ class LoginSignUpViewModel @Inject constructor(
                 _authState.value = result
                 repository.saveUserInfo(result)
                 _isLoading.value = false
-                state.value = true
+                onSignUp()
             } catch (e: Exception) {
                 setErrorMessage(e.message)
                 _isLoading.value = false
-                state.value = false
             }
         }
     }
 
-    fun loginWithEmailPassword(email: String, password: String) {
+    fun loginWithEmailPassword(email: String, password: String, onLogin: () -> Unit) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 val result = repository.loginWithEmailAndPassword(email, password)
                 _authState.value = result
                 _isLoading.value = false
-                state.value = true
+                onLogin()
             } catch (e: Exception) {
                 setErrorMessage(e.message)
                 _isLoading.value = false
-                state.value = false
             }
         }
     }
@@ -93,12 +88,10 @@ class LoginSignUpViewModel @Inject constructor(
                 _isLoading.value = true
                 repository.saveUserInfo(authResult)
                 _isLoading.value = false
-                state.value = true
 
             } catch (e: Exception) {
                 setErrorMessage(e.message)
                 _isLoading.value = false
-                state.value = false
             }
 
         }
