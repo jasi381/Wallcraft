@@ -12,6 +12,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import com.jasmeet.wallcraft.model.pagingSource.HomePagingSource
 import com.jasmeet.wallcraft.model.repo.HomeRepo
@@ -65,7 +66,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadData(){
+    fun updateOrderBy(orderBy: String) {
+        if (Utils.isNetworkAvailable(context)) {
+            loadData(orderBy)
+        } else {
+            _error.value = "No Internet Connection"
+        }
+    }
+
+
+    private fun loadData(orderBy: String = OrderBy.LATEST.displayName) {
         viewModelScope.launch {
             try{
                 Pager(
@@ -73,7 +83,7 @@ class HomeViewModel @Inject constructor(
                         pageSize = 70,
                         enablePlaceholders = true
                     ),
-                    pagingSourceFactory = {HomePagingSource(homeRepo)}
+                    pagingSourceFactory = { HomePagingSource(homeRepo, orderBy) }
                 ).flow
                     .cachedIn(viewModelScope)
                     .distinctUntilChanged()

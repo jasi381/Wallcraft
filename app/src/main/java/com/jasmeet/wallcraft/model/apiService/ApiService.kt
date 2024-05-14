@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.model.apiService
 
 import com.jasmeet.wallcraft.BuildConfig
+import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import retrofit2.http.GET
@@ -18,7 +19,7 @@ interface ApiService {
     suspend fun getHomeScreenData(
         @Query("page") page: Int,
         @Query("per_page") perPage: Int = 20,
-        @Query("order_by") orderBy: String = "latest",
+        @Query("order_by") orderBy: String = OrderBy.LATEST.displayName,
         @Query("client_id") clientId: String = CLIENT_ID,
     ): List<HomeApiResponse>
 
