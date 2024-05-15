@@ -3,14 +3,10 @@ package com.jasmeet.wallcraft.view.screens
 import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
@@ -70,7 +66,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
@@ -96,7 +91,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -130,11 +124,6 @@ fun SharedTransitionScope.DetailsScreen(
 
     val shareLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
-
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-    val byteArray = remember { mutableStateOf<ByteArray?>(null) }
-
-
 
     LaunchedEffect(true) {
         downloadedImages = downloadDao.getAllDownloads().toMutableList()
@@ -242,44 +231,7 @@ fun SharedTransitionScope.DetailsScreen(
 
                     IconTonalButtonComponent(
                         icon = R.drawable.ic_share,
-                        onClick = {
-                            coroutine.launch(Dispatchers.IO) {
-                                bitmap.value = data?.let { Utils.getBitmapFromUrl(it) }
-                                byteArray.value = bitmap.value.let {
-                                    it?.let { it1 ->
-                                        Utils.bitmapToByteArray(
-                                            it1
-                                        )
-                                    }
-                                }
-
-                                val imagesDir =
-                                    context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                                val imageFile = File(imagesDir, "shared_image.jpg")
-                                FileOutputStream(imageFile).use { outputStream ->
-                                    bitmap.value?.compress(
-                                        Bitmap.CompressFormat.JPEG,
-                                        75,
-                                        outputStream
-                                    )
-                                }
-                                val uri = FileProvider.getUriForFile(
-                                    context,
-                                    "${context.packageName}.fileprovider",
-                                    imageFile
-                                )
-
-                                withContext(Dispatchers.Main) {
-                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "image/jpeg"
-                                        putExtra(Intent.EXTRA_STREAM, uri)
-                                    }
-                                    val chooser = Intent.createChooser(shareIntent, "Share Image")
-                                    Log.d("ShareImage", "Launching share intent")
-                                    shareLauncher.launch(chooser)
-                                }
-                            }
-                        }
+                        onClick = { detailsViewModel.shareImage(data, shareLauncher) }
                     )
 
                 }
@@ -470,25 +422,6 @@ fun SharedTransitionScope.DetailsScreen(
             }
         }
     }
-}
-
-fun shareImage(
-    data: String?,
-    shareImageLauncher: ActivityResultLauncher<Intent>,
-    context: Context
-) {
-
-
-    val bitmap = data?.let { Utils.getBitmapFromUrl(it) }
-    val byteArray = bitmap?.let { Utils.bitmapToByteArray(it) }
-
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "image/jpeg"
-        putExtra(Intent.EXTRA_STREAM, byteArray)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    shareImageLauncher.launch(Intent.createChooser(shareIntent, "Share Image"))
-
 }
 
 
