@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,17 +23,18 @@ fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit, modifier: Modifier 
 
         colors = IconButtonDefaults.filledIconButtonColors(
             containerColor = Color(
-                MaterialTheme.colorScheme.background.copy(alpha = 0.4f).toArgb()
+                Color(0xffF5F5F5).copy(alpha = 0.5f).toArgb()
             )
         ),
-        modifier = modifier
+        modifier = modifier.size(42.dp)
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = icon),
             contentDescription = "",
             modifier = Modifier
                 .padding(4.dp)
-                .size(45.dp)
+                .size(45.dp),
+            tint = Color.Black.copy(0.8f)
         )
     }
 

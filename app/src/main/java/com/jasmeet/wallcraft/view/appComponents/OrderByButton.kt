@@ -18,39 +18,23 @@ fun OrderByButton(
     onClick: () -> Unit,
     text: String
 ) {
-//    Button(
-//        colors = ButtonDefaults.buttonColors(
-//            containerColor = if (isSelected) Color.Red else Color.Transparent,
-//            contentColor = Color.White
-//        ),
-//        onClick = onClick
-//    ) {
-//        Text(text = text, fontFamily = poppins)
-//    }
-
     Surface(
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
         color = Color.Transparent
     ) {
 
-//        Text(
-//            text = text,
-//            style = MaterialTheme.typography.bodySmall,
-//            color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-//            modifier = Modifier.background(if(isSelected) Color.Red else Color.Transparent,MaterialTheme.shapes.large).padding(8.dp)
-//        )
         TextComponent(
             text = text,
-            textSize = 15.sp,
+            textSize = 16.sp,
             fontFamily = poppins,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             textColor = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
                 alpha = 0.6f
             ),
             modifier = Modifier
                 .background(
-                    if (isSelected) Color.Red else Color.Transparent,
+                    if (isSelected) Color(0xff725ffe) else Color.Transparent,
                     MaterialTheme.shapes.large
                 )
                 .padding(vertical = 2.dp, horizontal = 8.dp)

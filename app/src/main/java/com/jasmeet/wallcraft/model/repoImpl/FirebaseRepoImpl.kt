@@ -4,14 +4,14 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jasmeet.wallcraft.model.Collections
-import com.jasmeet.wallcraft.model.repo.LoginSignUpRepo
+import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.userInfo.UserInfo
 import kotlinx.coroutines.tasks.await
 
-class LoginSignUpRepoImpl(
+class FirebaseRepoImpl(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore
-) : LoginSignUpRepo {
+) : FirebaseRepo {
     override suspend fun loginWithEmailAndPassword(email: String, password: String): AuthResult {
         return auth.signInWithEmailAndPassword(email, password).await()
     }
@@ -37,5 +37,13 @@ class LoginSignUpRepoImpl(
     }
     override suspend fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email).await()
+    }
+
+    override suspend fun fetchUserInfo(): UserInfo {
+        val uid = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
+        val document = db.collection(Collections.USER_COLLECTION).document(uid).get().await()
+        return document.toObject(UserInfo::class.java)
+            ?: throw IllegalStateException("User not found")
+
     }
 }

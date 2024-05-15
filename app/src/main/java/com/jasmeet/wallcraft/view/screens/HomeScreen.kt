@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,6 +53,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -61,29 +65,36 @@ import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.ScrollDirection
 import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.view.appComponents.OrderByButton
+import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.HomeViewModel
+import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
 import java.net.URLEncoder
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SharedTransitionScope.HomeScreen(
+    loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     onImageClicked: (Pair<String, String>) -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
     onScrollAction: (ScrollDirection) -> Unit,
 ) {
     val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
-
     val activity = (LocalContext.current as? Activity)
     val data = homeViewModel.homeData.collectAsLazyPagingItems()
     val error = homeViewModel.error.collectAsState()
     val context = LocalContext.current
+    val userInfo = loginSignUpViewModel.userInfo.collectAsState()
 
     val lazyListState = rememberLazyStaggeredGridState()
     var lastScrollPosition by remember { mutableIntStateOf(0) }
     var scrollDirection by remember { mutableStateOf(ScrollDirection.None) }
 
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    LaunchedEffect(Unit) {
+        loginSignUpViewModel.getUserInfo()
+    }
 
     BackHandler {
         if (selectedIndex.intValue == 1) {
@@ -93,6 +104,12 @@ fun SharedTransitionScope.HomeScreen(
             activity?.finish()
         }
     }
+
+
+    /**
+     *  This launched effect will observe the scroll direction which in
+     *  turn will manage the hiding of the bottom bar
+     */
 
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
@@ -118,7 +135,22 @@ fun SharedTransitionScope.HomeScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontFamily = poppins,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                navigationIcon = {
+                    AsyncImage(
+                        model = userInfo.value?.imgUrl,
+                        contentDescription = "userInfo",
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .size(38.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.img_placeholder)
+
                     )
                 },
                 scrollBehavior = scrollBehaviour
@@ -135,6 +167,9 @@ fun SharedTransitionScope.HomeScreen(
         } else {
             Column(
                 Modifier
+                    .offset(
+                        y = (-12).dp
+                    )
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding())
             ) {

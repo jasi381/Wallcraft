@@ -8,11 +8,11 @@ import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.DetailsRepo
+import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
-import com.jasmeet.wallcraft.model.repo.LoginSignUpRepo
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
-import com.jasmeet.wallcraft.model.repoImpl.LoginSignUpRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +42,8 @@ object AppModule {
     }
 
     @Provides
-    fun providesUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): LoginSignUpRepo {
-        return LoginSignUpRepoImpl(auth, db)
+    fun providesUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): FirebaseRepo {
+        return FirebaseRepoImpl(auth, db)
     }
 
 

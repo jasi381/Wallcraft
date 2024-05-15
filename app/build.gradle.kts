@@ -115,9 +115,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
 
-    //new google signIn
-    implementation("androidx.credentials:credentials:1.2.2")
-    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
-
+    //qr code generator
+    implementation("io.github.alexzhirkevich:qrose:1.0.1")
 }

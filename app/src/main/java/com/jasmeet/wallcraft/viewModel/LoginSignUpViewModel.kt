@@ -1,9 +1,11 @@
 package com.jasmeet.wallcraft.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
-import com.jasmeet.wallcraft.model.repo.LoginSignUpRepo
+import com.jasmeet.wallcraft.model.repo.FirebaseRepo
+import com.jasmeet.wallcraft.model.userInfo.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginSignUpViewModel @Inject constructor(
-    private val repository: LoginSignUpRepo,
+    private val repository: FirebaseRepo,
 ) : ViewModel() {
 
+    private val _userInfo = MutableStateFlow<UserInfo?>(null)
+    val userInfo: StateFlow<UserInfo?> = _userInfo
 
     private val _authState = MutableStateFlow<AuthResult?>(null)
     val authState: StateFlow<AuthResult?> = _authState
@@ -108,6 +112,18 @@ class LoginSignUpViewModel @Inject constructor(
                 _isLoading.value = false
             }
 
+        }
+    }
+
+    fun getUserInfo() {
+        viewModelScope.launch {
+            try {
+                val userInfo = repository.fetchUserInfo()
+                _userInfo.value = userInfo
+                Log.d("UserInfo", userInfo.email.toString())
+            } catch (e: Exception) {
+                setErrorMessage(e.message)
+            }
         }
     }
 }

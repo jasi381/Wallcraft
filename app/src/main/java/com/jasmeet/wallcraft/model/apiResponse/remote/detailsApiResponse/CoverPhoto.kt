@@ -42,7 +42,7 @@ data class CoverPhoto(
     var altDescription: String?,
 
     @SerializedName("breadcrumbs")
-    var breadcrumbs: ArrayList<String>?,
+    var breadcrumbs: ArrayList<Breadcrumbs>?,
 
     @SerializedName("urls")
     var urls: Urls?,

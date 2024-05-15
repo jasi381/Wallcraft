@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Wallcraft</string>
+    <string name="select_wallpaper_type">You can select your preferred option from the list below to set this image as your background.</string>
 </resources>
