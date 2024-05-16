@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Wallcraft</string>
     <string name="select_wallpaper_type">You can select your preferred option from the list below to set this image as your background.</string>
+    <string name="select_download_type">You can select the desired download size from the options below based on the photo\'s dimensions.</string>
 </resources>

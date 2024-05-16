@@ -26,9 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val detailsRepo: DetailsRepo,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 
-) : ViewModel() {
+    ) : ViewModel() {
 
     private val _details: MutableStateFlow<DetailsApiResponse?> = MutableStateFlow(null)
     val details = _details.asStateFlow()
@@ -79,4 +79,6 @@ class DetailsViewModel @Inject constructor(
             }
         }
     }
+
+
 }

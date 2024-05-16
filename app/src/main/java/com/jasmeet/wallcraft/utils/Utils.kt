@@ -47,9 +47,9 @@ object Utils {
         }
     }
 
-    fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    fun bitmapToByteArray(bitmap: Bitmap, quality: Int = 50): ByteArray {
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 75, stream)
+        bitmap.compress(Bitmap.CompressFormat.PNG, quality, stream)
         return stream.toByteArray()
     }
 

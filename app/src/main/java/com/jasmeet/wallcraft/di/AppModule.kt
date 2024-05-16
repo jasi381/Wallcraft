@@ -1,5 +1,6 @@
 package com.jasmeet.wallcraft.di
 
+import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
@@ -8,11 +9,15 @@ import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.DetailsRepo
+import com.jasmeet.wallcraft.model.repo.DownloadRepo
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.model.repo.WallpaperRepo
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.DownloadRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.WallpaperRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +40,12 @@ object AppModule {
         return FirebaseAuth.getInstance()
     }
 
+    @Singleton
+    @Provides
+    fun provideContext(application: Application): Context {
+        return application
+    }
+
     @Provides
     @Singleton
     fun providesFirebaseDatabase(): FirebaseFirestore {
@@ -45,7 +56,6 @@ object AppModule {
     fun providesUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): FirebaseRepo {
         return FirebaseRepoImpl(auth, db)
     }
-
 
     @Provides
     @Singleton
@@ -92,4 +102,14 @@ object AppModule {
     @Singleton
     fun providesDetailsRepo(apiService: ApiService): DetailsRepo =
         DetailsRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun providesDownloadsRepo(context: Context): DownloadRepo =
+        DownloadRepoImpl(context)
+
+    @Provides
+    @Singleton
+    fun providesWallpapersRepo(context: Context): WallpaperRepo =
+        WallpaperRepoImpl(context)
 }

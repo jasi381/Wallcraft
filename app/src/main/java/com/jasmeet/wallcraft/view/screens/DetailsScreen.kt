@@ -1,10 +1,6 @@
 package com.jasmeet.wallcraft.view.screens
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
-import android.content.Context
-import android.net.Uri
-import android.os.Environment
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,17 +32,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -54,11 +50,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,27 +67,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.WallpaperType
-import com.jasmeet.wallcraft.model.apiResponse.local.DownloadEntity
-import com.jasmeet.wallcraft.model.database.DownloadsDatabase
-import com.jasmeet.wallcraft.utils.Utils
+import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
 import com.jasmeet.wallcraft.view.appComponents.BottomSheetComponent
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.LoadingButton
 import com.jasmeet.wallcraft.view.appComponents.NetworkImage
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
-import com.jasmeet.wallcraft.view.loadImageFromUrl
-import com.jasmeet.wallcraft.view.setWallpaper2
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.DetailsViewModel
+import com.jasmeet.wallcraft.viewModel.DownloadViewModel
+import com.jasmeet.wallcraft.viewModel.WallpaperViewModel
+import io.github.alexzhirkevich.qrose.options.QrBrush
+import io.github.alexzhirkevich.qrose.options.QrColors
+import io.github.alexzhirkevich.qrose.options.QrFrameShape
 import io.github.alexzhirkevich.qrose.options.QrPixelShape
 import io.github.alexzhirkevich.qrose.options.QrShapes
-import io.github.alexzhirkevich.qrose.options.roundCorners
+import io.github.alexzhirkevich.qrose.options.brush
+import io.github.alexzhirkevich.qrose.options.circle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -100,39 +96,28 @@ fun SharedTransitionScope.DetailsScreen(
     onBackClick: () -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
     id: String?,
-    detailsViewModel: DetailsViewModel = hiltViewModel()
+    detailsViewModel: DetailsViewModel = hiltViewModel(),
+    wallpaperViewModel: WallpaperViewModel = hiltViewModel(),
+    downloadViewModel: DownloadViewModel = hiltViewModel(),
+    onProfileImageClick: () -> Unit = {}
 ) {
 
     val details = detailsViewModel.details.collectAsState()
+    val isWallpaperLoading = wallpaperViewModel.isLoading.collectAsState()
+    val isDownloading = downloadViewModel.isLoading.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         id?.let { detailsViewModel.getDetails(it) }
     }
 
-
-    val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
-
-    var downloadedImages by remember { mutableStateOf<List<DownloadEntity>>(emptyList()) }
     val sheetState = rememberModalBottomSheetState()
-    var showWallpaperTypeSheet by rememberSaveable { mutableStateOf(false) }
+    val showWallpaperTypeSheet = rememberSaveable { mutableStateOf(false) }
+    val showDownloadQualitySheet = rememberSaveable { mutableStateOf(false) }
     var showQrCode by rememberSaveable { mutableStateOf(false) }
-    val isLoading = remember { mutableStateOf(false) }
-
-    val iconState = remember { mutableIntStateOf(R.drawable.ic_download) }
-    val downloadDao = DownloadsDatabase.getInstance(context).downloadDao()
-
     val shareLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
-    LaunchedEffect(true) {
-        downloadedImages = downloadDao.getAllDownloads().toMutableList()
-    }
-
-    LaunchedEffect(downloadedImages) {
-        val isDownloaded = downloadedImages.any { it.url == data }
-        iconState.intValue = if (isDownloaded) R.drawable.ic_downloaded else R.drawable.ic_download
-    }
 
     BackHandler {
         onBackClick.invoke()
@@ -196,7 +181,9 @@ fun SharedTransitionScope.DetailsScreen(
                             url = it,
                             modifier = Modifier
                                 .clip(CircleShape)
-                                .clickable {}
+                                .clickable {
+                                    onProfileImageClick.invoke()
+                                }
                                 .size(45.dp)
 
                         )
@@ -211,20 +198,9 @@ fun SharedTransitionScope.DetailsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     IconTonalButtonComponent(
-                        icon = iconState.intValue,
+                        icon = R.drawable.ic_download,
                         onClick = {
-                            coroutine.launch {
-                                if (!downloadedImages.any { it.url == data }) {
-                                    withContext(Dispatchers.IO) {
-                                        downloadFile(data.toString(), context)
-                                        downloadedImages =
-                                            downloadDao.getAllDownloads().toMutableList()
-                                        iconState.intValue = R.drawable.ic_downloaded
-                                    }
-
-                                }
-                            }
-
+                            showDownloadQualitySheet.value = true
                         }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -233,14 +209,19 @@ fun SharedTransitionScope.DetailsScreen(
                         icon = R.drawable.ic_share,
                         onClick = { detailsViewModel.shareImage(data, shareLauncher) }
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
 
+                    IconTonalButtonComponent(
+                        icon = R.drawable.ic_qr_code,
+                        onClick = { showQrCode = true }
+                    )
                 }
 
             }
 
             Button(
                 onClick = {
-                    showWallpaperTypeSheet = true
+                    showWallpaperTypeSheet.value = true
                 },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -261,137 +242,25 @@ fun SharedTransitionScope.DetailsScreen(
 
             }
         }
-        if (showWallpaperTypeSheet) {
-            BottomSheetComponent(
-                onDismiss = {
-                    showWallpaperTypeSheet = false
-                    coroutine.launch {
-                        sheetState.hide()
-                    }
-                },
-                sheetState = sheetState,
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            ) {
-                AnimatedVisibility(
-                    visible = !isLoading.value,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.wallpaper),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(bottom = 8.dp)
-                                .size(40.dp),
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                        TextComponent(
-                            text = stringResource(id = R.string.select_wallpaper_type),
-                            fontFamily = poppins,
-                            modifier = Modifier.padding(bottom = 16.dp, start = 10.dp, end = 10.dp),
-                            textAlign = TextAlign.Center,
-                            maxLines = Int.MAX_VALUE,
-                            textSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        LoadingButton(
-                            onClick = {
-                                setWallpaperAndHandleLoading(
-                                    coroutine,
-                                    context,
-                                    data,
-                                    WallpaperType.LOCK_SCREEN,
-                                    isLoading
-                                )
-                                showWallpaperTypeSheet = false
-                                coroutine.launch {
-                                    sheetState.hide()
-                                }
-                            },
-                            loading = false,
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .fillMaxWidth(),
-                            text = "Set as Lock Screen Wallpaper",
-                            textSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        LoadingButton(
-                            onClick = {
-                                setWallpaperAndHandleLoading(
-                                    coroutine,
-                                    context,
-                                    data,
-                                    WallpaperType.HOME_SCREEN,
-                                    isLoading
-                                )
-                                showWallpaperTypeSheet = false
-                                coroutine.launch {
-                                    sheetState.hide()
-                                }
-                            },
-                            loading = false,
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .fillMaxWidth(),
-                            text = "Set as Home Screen Wallpaper",
-                            textSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        LoadingButton(
-                            onClick = {
-                                setWallpaperAndHandleLoading(
-                                    coroutine,
-                                    context,
-                                    data,
-                                    WallpaperType.BOTH,
-                                    isLoading
-                                )
-                                showWallpaperTypeSheet = false
-                                coroutine.launch {
-                                    sheetState.hide()
-                                }
-                            },
-                            loading = false,
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .fillMaxWidth(),
-                            text = "Set as Lock & Home Screen Wallpaper",
-                            textSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                    }
-                }
-
-                AnimatedVisibility(
-                    visible = isLoading.value,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Circle(
-                            modifier = Modifier.padding(vertical = 15.dp),
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    }
-
-                }
-            }
+        if (showWallpaperTypeSheet.value) {
+            WallpaperTypeBottomSheet(
+                showWallpaperTypeSheet,
+                coroutine,
+                sheetState,
+                isWallpaperLoading,
+                wallpaperViewModel,
+                data
+            )
+        }
+        if (showDownloadQualitySheet.value) {
+            ShowDownloadQualityBottomSheet(
+                showDownloadQualitySheet,
+                coroutine,
+                sheetState,
+                details,
+                downloadViewModel,
+                isDownloading
+            )
         }
         if (showQrCode) {
             Dialog(onDismissRequest = {
@@ -403,20 +272,29 @@ fun SharedTransitionScope.DetailsScreen(
                         .background(Color.White, MaterialTheme.shapes.extraLarge),
                     contentAlignment = Alignment.Center
                 ) {
-                    val qrcodePainter = data?.let {
-                        rememberQrCodePainter(
-                            data = it,
-                            shapes = QrShapes(
-                                darkPixel = QrPixelShape.roundCorners()
-                            )
+
+                    val qrcodePainter = rememberQrCodePainter(
+                        data = data.toString(),
+                        shapes = QrShapes(
+                            darkPixel = QrPixelShape.circle(),
+                            frame = QrFrameShape.circle()
+                        ),
+                        colors = QrColors(
+                            dark = QrBrush.brush {
+                                Brush.linearGradient(
+                                    0f to Color.Red,
+                                    1f to Color.Blue,
+                                    end = Offset(it, it)
+                                )
+                            }
                         )
-                    }
-                    qrcodePainter?.let {
-                        Image(
-                            painter = it,
-                            contentDescription = "QR code referring to the example.com website"
-                        )
-                    }
+
+                    )
+                    Image(
+                        painter = qrcodePainter,
+                        contentDescription = "QR code referring to the example.com website",
+                        modifier = Modifier.padding(10.dp)
+                    )
 
                 }
             }
@@ -424,69 +302,281 @@ fun SharedTransitionScope.DetailsScreen(
     }
 }
 
-
-private fun setWallpaperAndHandleLoading(
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShowDownloadQualityBottomSheet(
+    showDownloadQualitySheet: MutableState<Boolean>,
     coroutine: CoroutineScope,
-    context: Context,
-    data: String?,
-    wallpaperType: WallpaperType,
-    isLoading: MutableState<Boolean>
+    sheetState: SheetState,
+    details: State<DetailsApiResponse?>,
+    downloadViewModel: DownloadViewModel,
+    isDownloading: State<Boolean>
 ) {
-    isLoading.value = true
-    coroutine.launch {
-        val bitmap = withContext(Dispatchers.IO) {
-            data?.let { loadImageFromUrl(it) }
+    BottomSheetComponent(
+        onDismiss = {
+            showDownloadQualitySheet.value = false
+            coroutine.launch {
+                sheetState.hide()
+            }
+        },
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+    ) {
+        AnimatedVisibility(
+            visible = !isDownloading.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_download),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .size(40.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                TextComponent(
+                    text = stringResource(id = R.string.select_download_type),
+                    fontFamily = poppins,
+                    modifier = Modifier.padding(bottom = 16.dp, start = 10.dp, end = 10.dp),
+                    textAlign = TextAlign.Center,
+                    maxLines = Int.MAX_VALUE,
+                    textSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LoadingButton(
+                    onClick = {
+                        details.value?.urls?.raw?.let { downloadViewModel.startDownload(it) }
+                        showDownloadQualitySheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Raw (Very High Quality)",
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LoadingButton(
+                    onClick = {
+                        details.value?.urls?.full?.let { downloadViewModel.startDownload(it) }
+                        showDownloadQualitySheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Full (High Quality)",
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LoadingButton(
+                    onClick = {
+                        details.value?.urls?.regular?.let { downloadViewModel.startDownload(it) }
+                        showDownloadQualitySheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Medium (Medium Quality)",
+                    textSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LoadingButton(
+                    onClick = {
+                        details.value?.urls?.small?.let { downloadViewModel.startDownload(it) }
+                        showDownloadQualitySheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Low (Low Quality)",
+                    textSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+            }
         }
-        setWallpaper2(bitmap, context, wallpaperType)
-        isLoading.value = false
+
+        AnimatedVisibility(
+            visible = isDownloading.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Circle(
+                    modifier = Modifier.padding(vertical = 15.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun WallpaperTypeBottomSheet(
+    showWallpaperTypeSheet: MutableState<Boolean>,
+    coroutine: CoroutineScope,
+    sheetState: SheetState,
+    isWallpaperLoading: State<Boolean>,
+    wallpaperViewModel: WallpaperViewModel,
+    data: String?
+) {
+    BottomSheetComponent(
+        onDismiss = {
+            showWallpaperTypeSheet.value = false
+            coroutine.launch {
+                sheetState.hide()
+            }
+        },
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+    ) {
+        AnimatedVisibility(
+            visible = !isWallpaperLoading.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.wallpaper),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .size(40.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                TextComponent(
+                    text = stringResource(id = R.string.select_wallpaper_type),
+                    fontFamily = poppins,
+                    modifier = Modifier.padding(bottom = 16.dp, start = 10.dp, end = 10.dp),
+                    textAlign = TextAlign.Center,
+                    maxLines = Int.MAX_VALUE,
+                    textSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LoadingButton(
+                    onClick = {
+
+                        wallpaperViewModel.setWallpaperAndHandleLoading(
+                            data.toString(),
+                            WallpaperType.LOCK_SCREEN
+                        )
+                        showWallpaperTypeSheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Set as Lock Screen Wallpaper",
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LoadingButton(
+                    onClick = {
+                        wallpaperViewModel.setWallpaperAndHandleLoading(
+                            data.toString(),
+                            WallpaperType.HOME_SCREEN
+                        )
+                        showWallpaperTypeSheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Set as Home Screen Wallpaper",
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LoadingButton(
+                    onClick = {
+                        wallpaperViewModel.setWallpaperAndHandleLoading(
+                            data.toString(),
+                            WallpaperType.BOTH
+                        )
+                        showWallpaperTypeSheet.value = false
+                        coroutine.launch {
+                            sheetState.hide()
+                        }
+                    },
+                    loading = false,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    text = "Set as Lock & Home Screen Wallpaper",
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+            }
+        }
+
+        AnimatedVisibility(
+            visible = isWallpaperLoading.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Circle(
+                    modifier = Modifier.padding(vertical = 15.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+
+        }
     }
 }
 
 
-private fun downloadFile(url: String, context: Context) {
-    val appName = context.getString(R.string.app_name)
 
-    val storageDir =
-        File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            appName
-        )
-    if (!storageDir.exists()) {
-        storageDir.mkdirs()
-    }
-
-    val fileName = "image.jpg" // Name of the file to be saved
-    val file = File(storageDir, fileName)
-
-    val request = DownloadManager.Request(Uri.parse(url))
-        .setTitle("Image Download") // Title of the Download Notification
-        .setDescription("Downloading") // Description of the Download Notification
-        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // Visibility of the download Notification
-        .setAllowedOverMetered(true) //  if download is allowed on Mobile network
-        .setAllowedOverRoaming(true) //  if download is allowed on roaming network
-        .setDestinationUri(Uri.fromFile(file)) // Saving downloaded file to the specified destination
-
-    val downloadDao = DownloadsDatabase.getInstance(context).downloadDao()
-
-    val coroutine = CoroutineScope(Dispatchers.IO)
-    coroutine.launch {
-        val imageBitmap = Utils.getBitmapFromUrl(url)
-
-        val byteArray = imageBitmap?.let { Utils.bitmapToByteArray(it) }
-
-        downloadDao.insertDownload(DownloadEntity(url, byteArray))
-    }
-
-    val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-    downloadManager.enqueue(request)
-}
-
-
-//@Composable
-//private fun rememberShareImageLauncher(): ActivityResultLauncher<Intent> {
-//    return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//        // Handle the result if needed
-//    }
-//}
 
 
