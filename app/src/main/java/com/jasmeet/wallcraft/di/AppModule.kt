@@ -12,11 +12,15 @@ import com.jasmeet.wallcraft.model.repo.DetailsRepo
 import com.jasmeet.wallcraft.model.repo.DownloadRepo
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.model.repo.PhotographerPhotosRepo
+import com.jasmeet.wallcraft.model.repo.PostedByRepo
 import com.jasmeet.wallcraft.model.repo.WallpaperRepo
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.DownloadRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.PhotographerPhotosRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.PostedByRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.WallpaperRepoImpl
 import dagger.Module
 import dagger.Provides
@@ -112,4 +116,14 @@ object AppModule {
     @Singleton
     fun providesWallpapersRepo(context: Context): WallpaperRepo =
         WallpaperRepoImpl(context)
+
+    @Provides
+    @Singleton
+    fun providesPostedByRepo(apiService: ApiService): PostedByRepo =
+        PostedByRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun providesPostedByPhotosRepo(apiService: ApiService): PhotographerPhotosRepo =
+        PhotographerPhotosRepoImpl(apiService)
 }

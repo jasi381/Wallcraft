@@ -1,9 +1,11 @@
 package com.jasmeet.wallcraft.view.navigation.graphs
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -25,9 +27,13 @@ import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
 import com.jasmeet.wallcraft.view.appComponents.BottomBar
 import com.jasmeet.wallcraft.view.navigation.Graph
 import com.jasmeet.wallcraft.view.navigation.data
+import com.jasmeet.wallcraft.view.navigation.photographerName
+import com.jasmeet.wallcraft.view.navigation.photographerUrl
+import com.jasmeet.wallcraft.view.navigation.photographerUserName
 import com.jasmeet.wallcraft.view.screens.CategoriesScreen
 import com.jasmeet.wallcraft.view.screens.DetailsScreen
 import com.jasmeet.wallcraft.view.screens.HomeScreen
+import com.jasmeet.wallcraft.view.screens.PhotographerDetailsScreen
 import com.jasmeet.wallcraft.view.screens.SearchScreen
 import com.jasmeet.wallcraft.view.screens.SettingsScreen
 import kotlinx.coroutines.Job
@@ -152,7 +158,7 @@ fun HomeNavGraph(
                 SettingsScreen()
             }
 
-            composable(route = "${Graph.DETAILS}/{data}/{$id}") { navBackStackEntry ->
+            composable(route = "${Graph.DETAILS}/{$data}/{$id}") { navBackStackEntry ->
                 val data = navBackStackEntry.arguments?.getString(data)
                 val id = navBackStackEntry.arguments?.getString(id.toString())
                 DetailsScreen(
@@ -162,8 +168,45 @@ fun HomeNavGraph(
                         navController.popBackStack()
                     },
                     animatedVisibilityScope = this@composable,
+                    onProfileImageClick = { triple ->
+                        navController.navigate("${Graph.PHOTOGRAPHER_DETAILS}/${triple.first}/${triple.second}/${triple.third}")
+                    }
+                )
+            }
 
+            composable(
+                route = "${Graph.PHOTOGRAPHER_DETAILS}/{$photographerName}/{$photographerUrl}/{$photographerUserName}",
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(700, easing = LinearEasing)
                     )
+                },
+                popEnterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) { navBackStackEntry ->
+                val name = navBackStackEntry.arguments?.getString(photographerName)
+                val url = navBackStackEntry.arguments?.getString(photographerUrl)
+                val userName = navBackStackEntry.arguments?.getString(photographerUserName)
+
+                PhotographerDetailsScreen(
+                    name = name,
+                    url = url,
+                    userName = userName,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    animatedVisibilityScope = this@composable,
+                    onImageClicked = { pair ->
+                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+
+                    }
+                )
+
             }
         }
     }

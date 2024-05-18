@@ -18,10 +18,11 @@ class DownloadViewModel @Inject constructor(
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    fun startDownload(url: String) {
+    fun startDownload(url: String, onDownloadComplete: (String) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
             downloadRepo.downloadFile(url)
+            onDownloadComplete("Download Complete")
             _isLoading.value = false
         }
     }

@@ -14,7 +14,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun IconTonalButtonComponent(
+    icon: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Int = 42
+) {
 
     FilledTonalIconButton(
         onClick = {
@@ -26,7 +31,7 @@ fun IconTonalButtonComponent(icon: Int, onClick: () -> Unit, modifier: Modifier 
                 Color(0xffF5F5F5).copy(alpha = 0.5f).toArgb()
             )
         ),
-        modifier = modifier.size(42.dp)
+        modifier = modifier.size(size.dp)
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = icon),

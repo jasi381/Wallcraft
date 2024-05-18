@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -93,7 +92,6 @@ class HomeViewModel @Inject constructor(
                     }
             }catch (e:Exception){
                 _error.value = e.message
-                Log.e("HomeViewModel", "Error loading data: ${e.message}", e)
             }
         }
     }

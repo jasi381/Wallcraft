@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.view.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,6 +89,7 @@ import io.github.alexzhirkevich.qrose.options.circle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -99,7 +102,7 @@ fun SharedTransitionScope.DetailsScreen(
     detailsViewModel: DetailsViewModel = hiltViewModel(),
     wallpaperViewModel: WallpaperViewModel = hiltViewModel(),
     downloadViewModel: DownloadViewModel = hiltViewModel(),
-    onProfileImageClick: () -> Unit = {}
+    onProfileImageClick: (Triple<String, String, String>) -> Unit
 ) {
 
     val details = detailsViewModel.details.collectAsState()
@@ -180,9 +183,22 @@ fun SharedTransitionScope.DetailsScreen(
                         NetworkImage(
                             url = it,
                             modifier = Modifier
+                                .sharedElement(
+                                    state = rememberSharedContentState(
+                                        key = "image-${it}"
+                                    ),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                )
                                 .clip(CircleShape)
                                 .clickable {
-                                    onProfileImageClick.invoke()
+                                    val encodeImgUrl = URLEncoder.encode(it, "UTF-8")
+                                    onProfileImageClick.invoke(
+                                        Triple(
+                                            details.value?.user?.name.toString(),
+                                            encodeImgUrl,
+                                            details.value?.user?.username.toString()
+                                        )
+                                    )
                                 }
                                 .size(45.dp)
 
@@ -312,6 +328,8 @@ private fun ShowDownloadQualityBottomSheet(
     downloadViewModel: DownloadViewModel,
     isDownloading: State<Boolean>
 ) {
+
+    val context = LocalContext.current
     BottomSheetComponent(
         onDismiss = {
             showDownloadQualitySheet.value = false
@@ -325,7 +343,7 @@ private fun ShowDownloadQualityBottomSheet(
         AnimatedVisibility(
             visible = !isDownloading.value,
             enter = fadeIn(),
-            exit = fadeOut()
+            exit = fadeOut(),
         ) {
             Column(
                 Modifier
@@ -355,7 +373,14 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
-                        details.value?.urls?.raw?.let { downloadViewModel.startDownload(it) }
+                        details.value?.urls?.raw?.let {
+                            downloadViewModel.startDownload(
+                                it,
+                                onDownloadComplete = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                         showDownloadQualitySheet.value = false
                         coroutine.launch {
                             sheetState.hide()
@@ -373,7 +398,14 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
-                        details.value?.urls?.full?.let { downloadViewModel.startDownload(it) }
+                        details.value?.urls?.full?.let {
+                            downloadViewModel.startDownload(
+                                it,
+                                onDownloadComplete = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                         showDownloadQualitySheet.value = false
                         coroutine.launch {
                             sheetState.hide()
@@ -391,7 +423,14 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
-                        details.value?.urls?.regular?.let { downloadViewModel.startDownload(it) }
+                        details.value?.urls?.regular?.let {
+                            downloadViewModel.startDownload(
+                                it,
+                                onDownloadComplete = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                         showDownloadQualitySheet.value = false
                         coroutine.launch {
                             sheetState.hide()
@@ -408,7 +447,14 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
-                        details.value?.urls?.small?.let { downloadViewModel.startDownload(it) }
+                        details.value?.urls?.small?.let {
+                            downloadViewModel.startDownload(
+                                it,
+                                onDownloadComplete = { message ->
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
                         showDownloadQualitySheet.value = false
                         coroutine.launch {
                             sheetState.hide()
@@ -417,11 +463,12 @@ private fun ShowDownloadQualityBottomSheet(
                     loading = false,
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
                     text = "Low (Low Quality)",
                     textSize = 14.sp
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(46.dp))
 
             }
         }

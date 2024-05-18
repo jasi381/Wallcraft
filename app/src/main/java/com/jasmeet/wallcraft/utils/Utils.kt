@@ -1,10 +1,12 @@
 package com.jasmeet.wallcraft.utils
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.util.Patterns
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -55,6 +57,11 @@ object Utils {
 
     fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    }
+
+    fun openUrlInBrowser(context: Context, url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
     }
 
 
