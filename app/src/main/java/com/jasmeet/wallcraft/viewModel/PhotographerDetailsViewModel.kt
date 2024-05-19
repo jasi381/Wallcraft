@@ -26,9 +26,8 @@ class PhotographerDetailsViewModel
     private val _details: MutableStateFlow<PostedByApiResponse?> = MutableStateFlow(null)
     val details = _details.asStateFlow()
 
-    private val _photos: MutableStateFlow<List<PhotographerPhotosApiResponse?>> = MutableStateFlow(
-        emptyList()
-    )
+    private val _photos: MutableStateFlow<List<PhotographerPhotosApiResponse?>> =
+        MutableStateFlow(emptyList())
     val photos = _photos.asStateFlow()
 
     private val _error: MutableStateFlow<String> = MutableStateFlow("")

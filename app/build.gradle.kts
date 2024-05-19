@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:\\Users\\Jasi\\StudioProjects\\Wallcraft\\keyStore.jks")
+            storePassword = "jasmeet34"
+            keyAlias = "release"
+            keyPassword = "jasmeet34"
+        }
+    }
     namespace = "com.jasmeet.wallcraft"
     compileSdk = 34
 
@@ -31,6 +39,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

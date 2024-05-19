@@ -144,7 +144,21 @@ fun HomeNavGraph(
             composable(
                 route = BottomBarScreen.Category.route
             ) {
-                CategoriesScreen(navController = navController)
+                CategoriesScreen(
+                    navController = navController,
+                    onScrollAction = { direction ->
+                        when (direction) {
+                            ScrollDirection.Down -> {
+                                onScrollAction(ScrollDirection.Down)
+                            }
+
+                            ScrollDirection.Up -> {
+                                onScrollAction(ScrollDirection.Up)
+                            }
+
+                            else -> {}
+                        }
+                    })
             }
             composable(
                 route = BottomBarScreen.Search.route

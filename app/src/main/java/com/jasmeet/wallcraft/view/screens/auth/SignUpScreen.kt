@@ -153,7 +153,11 @@ fun SignUpScreen(
 
 
             LoadingButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                    validateAndInitiateSignUp(email, password, loginSignUpViewModel, navController)
+                },
                 loading = loading,
                 modifier = Modifier
                     .padding(top = 25.dp)
