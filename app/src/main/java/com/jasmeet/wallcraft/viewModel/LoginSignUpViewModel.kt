@@ -1,6 +1,5 @@
 package com.jasmeet.wallcraft.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
@@ -20,9 +19,6 @@ class LoginSignUpViewModel @Inject constructor(
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo: StateFlow<UserInfo?> = _userInfo
-
-    private val _authState = MutableStateFlow<AuthResult?>(null)
-    val authState: StateFlow<AuthResult?> = _authState
 
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> = _errorState
@@ -59,7 +55,6 @@ class LoginSignUpViewModel @Inject constructor(
             try {
                 _isLoading.value = true
                 val result = repository.signUpWithEmailAndPassword(email, password)
-                _authState.value = result
                 repository.saveUserInfo(result)
                 _isLoading.value = false
                 onSignUp()
@@ -74,8 +69,7 @@ class LoginSignUpViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                val result = repository.loginWithEmailAndPassword(email, password)
-                _authState.value = result
+                repository.loginWithEmailAndPassword(email, password)
                 _isLoading.value = false
                 onLogin()
             } catch (e: Exception) {
@@ -120,7 +114,6 @@ class LoginSignUpViewModel @Inject constructor(
             try {
                 val userInfo = repository.fetchUserInfo()
                 _userInfo.value = userInfo
-                Log.d("UserInfo", userInfo.email.toString())
             } catch (e: Exception) {
                 setErrorMessage(e.message)
             }

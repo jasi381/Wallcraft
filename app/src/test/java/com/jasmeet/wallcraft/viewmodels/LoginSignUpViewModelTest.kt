@@ -4,12 +4,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.firebase.auth.AuthResult
 import com.jasmeet.wallcraft.MainDispatcherRule
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
+import com.jasmeet.wallcraft.model.userInfo.UserInfo
 import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -124,6 +127,104 @@ class LoginSignUpViewModelTest {
         assertEquals(errorMessage, viewModel.errorState.value)
 
     }
+
+
+    @Test
+    fun `resetPassword success`() = runTest {
+        // Given
+        val email = "test@gmail.com"
+        val onResetPassword = mock<() -> Unit>()
+        whenever(repo.sendPasswordResetEmail(any())).thenReturn(Unit)
+
+        // When
+        viewModel.resetPassword(email, onResetPassword)
+
+        // Then
+        verify(repo).sendPasswordResetEmail(email)
+        verify(onResetPassword).invoke()
+        assertEquals(false, viewModel.isLoading.value)
+        assertNull(viewModel.errorState.value)
+    }
+
+    @Test
+    fun `resetPassword failure`() = runTest {
+        // Given
+        val email = "invalid-email"
+        val errorMessage = "Error sending password reset email"
+        val onResetPassword = mock<() -> Unit>()
+        whenever(repo.sendPasswordResetEmail(any())).thenThrow(RuntimeException(errorMessage))
+
+        // When
+        viewModel.resetPassword(email, onResetPassword)
+
+        // Then
+        verify(repo).sendPasswordResetEmail(email)
+        verify(onResetPassword, never()).invoke()
+        assertEquals(false, viewModel.isLoading.value)
+        assertEquals(errorMessage, viewModel.errorState.value)
+    }
+
+    @Test
+    fun `saveData success`() = runTest {
+        // Given
+        val authResult = mock<AuthResult>()
+        whenever(repo.saveUserInfo(any())).thenReturn(Unit)
+
+        // When
+        viewModel.saveData(authResult)
+
+        // Then
+        verify(repo).saveUserInfo(authResult)
+        assertEquals(false, viewModel.isLoading.value)
+        assertNull(viewModel.errorState.value)
+    }
+
+    @Test
+    fun `saveData failure`() = runTest {
+        // Given
+        val authResult = mock<AuthResult>()
+        val errorMessage = "Error saving user info"
+        whenever(repo.saveUserInfo(any())).thenThrow(RuntimeException(errorMessage))
+
+        // When
+        viewModel.saveData(authResult)
+
+        // Then
+        verify(repo).saveUserInfo(authResult)
+        assertEquals(false, viewModel.isLoading.value)
+        assertEquals(errorMessage, viewModel.errorState.value)
+    }
+
+    @Test
+    fun `getUserInfo success`() = runTest {
+        // Given
+        val userInfo = UserInfo("test@gmail.com") // Mocked user info object
+        whenever(repo.fetchUserInfo()).thenReturn(userInfo)
+
+        // When
+        viewModel.getUserInfo()
+
+        // Then
+        verify(repo).fetchUserInfo()
+        assertEquals(userInfo, viewModel.userInfo.value)
+        assertNull(viewModel.errorState.value)
+    }
+
+    @Test
+    fun `getUserInfo failure`() = runTest {
+        // Given
+        val errorMessage = "Error fetching user info"
+        whenever(repo.fetchUserInfo()).thenThrow(RuntimeException(errorMessage))
+
+        // When
+        viewModel.getUserInfo()
+
+        // Then
+        verify(repo).fetchUserInfo()
+        assertEquals(errorMessage, viewModel.errorState.value)
+    }
+
+
 
 }
 
