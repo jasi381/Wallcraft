@@ -1,10 +1,10 @@
 [versions]
-agp = "8.4.0"
+agp = "8.4.1"
 coilCompose = "2.6.0"
 composeloading = "1.0.4"
 constraintlayoutCompose = "1.0.1"
 converterGson = "2.11.0"
-kotlin = "1.9.23"
+kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -24,12 +24,12 @@ retrofit = "2.11.0"
 hilt-android-compiler = "1.2.0"
 hiltVersion = "2.51.1"
 hiltNavigationCompose = "1.2.0"
-kspVersion = "1.9.23-1.0.20"
+kspVersion = "2.0.0-1.0.21"
 pagingRuntimeKtx = "3.3.0"
 animationCompose = "1.7.0-beta01"
 foundationCompose = "1.7.0-beta01"
 runtimeLivedata = "1.6.7"
-playServicesAuth = "21.1.1"
+playServicesAuth = "21.2.0"
 firebaseAuth = "23.0.0"
 googleServices = "4.4.1"
 gms-services = "4.4.1"
@@ -102,3 +102,4 @@ secrets-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradl
 hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 kotlinKsp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 gmsService = { id = "com.google.gms.google-services", version.ref = "gms-services" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

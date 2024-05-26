@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinKsp)
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.gmsService)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -50,11 +51,8 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
-        compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        compose = true
     }
     packaging {
         resources {
@@ -62,6 +60,10 @@ android {
         }
     }
 }
+composeCompiler {
+    enableStrongSkippingMode = true
+}
+
 
 dependencies {
 
@@ -126,4 +128,17 @@ dependencies {
 
     //qr code generator
     implementation("io.github.alexzhirkevich:qrose:1.0.1")
+
+    // Mockito for mocking dependencies
+    testImplementation("org.mockito:mockito-core:3.12.4")
+
+    // Mockito Kotlin for better Kotlin support
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
+
+    // For testing Kotlin coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // For Android Architecture Components testing
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 }
