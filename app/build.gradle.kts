@@ -135,9 +135,15 @@ dependencies {
     // Mockito Kotlin for better Kotlin support
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 
+    // MockK
+    testImplementation("io.mockk:mockk-android:1.13.11")
+    testImplementation("io.mockk:mockk-agent:1.13.11")
 
     // For testing Kotlin coroutines
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // For testing Robolectric
+    testImplementation("org.robolectric:robolectric:4.8.1")
 
     // For Android Architecture Components testing
     testImplementation("androidx.arch.core:core-testing:2.2.0")

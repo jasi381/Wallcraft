@@ -52,9 +52,7 @@ interface ApiService {
         @Query("per_page") perPage: Int = 30,
         @Query("order_by") orderBy: String = OrderBy.LATEST.displayName,
         @Query("client_id") clientId: String = CLIENT_ID,
-
         ): List<CategoriesApiResponse>
-
 
 
 }

@@ -1,6 +1,5 @@
 package com.jasmeet.wallcraft.viewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jasmeet.wallcraft.model.apiResponse.remote.categoriesApiResponse.CategoriesApiResponse
@@ -32,18 +31,16 @@ class CategoriesViewModel @Inject constructor(
         getCategories()
     }
 
-    private fun getCategories() {
+    fun getCategories() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 val response = categoriesRepo.getCategories()
                 _categories.value = response
-                Log.d("CategoriesViewModel", "getCategories: $response")
                 _isLoading.value = false
             } catch (e: Exception) {
                 e.printStackTrace()
                 _error.value = e.message.toString()
-                Log.d("CategoriesViewModel", "getCategories: ${e.message}")
                 _isLoading.value = false
             }
 
