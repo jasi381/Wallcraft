@@ -46,4 +46,8 @@ class CategoriesViewModel @Inject constructor(
 
         }
     }
+
+    fun sortCategoriesAlphabetically() {
+        _categories.value = _categories.value.sortedBy { it?.title }
+    }
 }

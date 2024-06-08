@@ -20,7 +20,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -116,6 +118,7 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
             Modifier
                 .nestedScroll(scrollBehaviour.nestedScrollConnection)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
@@ -136,15 +139,6 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
 
                 )
 
-            }
-            details.value?.results?.first()?.bio?.let {
-                TextComponent(
-                    text = it,
-                    textSize = 16.sp,
-                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp),
-                    maxLines = Int.MAX_VALUE,
-                    fontWeight = FontWeight.SemiBold
-                )
             }
             if (details.value?.results?.first()?.social?.instagramUsername != null || details.value?.results?.first()?.social?.twitterUsername != null)
                 TextComponent(

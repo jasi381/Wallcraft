@@ -9,6 +9,7 @@ import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.PhotosDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.CategoriesRepo
+import com.jasmeet.wallcraft.model.repo.CategoryPhotosRepo
 import com.jasmeet.wallcraft.model.repo.DetailsRepo
 import com.jasmeet.wallcraft.model.repo.DownloadRepo
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
@@ -17,6 +18,7 @@ import com.jasmeet.wallcraft.model.repo.PhotographerPhotosRepo
 import com.jasmeet.wallcraft.model.repo.PostedByRepo
 import com.jasmeet.wallcraft.model.repo.WallpaperRepo
 import com.jasmeet.wallcraft.model.repoImpl.CategoriesRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.CategoryPhotosRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.DownloadRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
@@ -133,4 +135,9 @@ object AppModule {
     @Singleton
     fun providesCategoriesRepo(apiService: ApiService): CategoriesRepo =
         CategoriesRepoImpl(apiService)
+
+    @Provides
+    @Singleton
+    fun providesCategoryPhotosRepo(apiService: ApiService): CategoryPhotosRepo =
+        CategoryPhotosRepoImpl(apiService)
 }

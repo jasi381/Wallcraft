@@ -127,24 +127,24 @@ dependencies {
     implementation(libs.play.services.auth)
 
     //qr code generator
-    implementation("io.github.alexzhirkevich:qrose:1.0.1")
+    implementation(libs.qrose)
 
     // Mockito for mocking dependencies
-    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation(libs.mockito.core)
 
     // Mockito Kotlin for better Kotlin support
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation(libs.mockito.kotlin)
 
     // MockK
-    testImplementation("io.mockk:mockk-android:1.13.11")
-    testImplementation("io.mockk:mockk-agent:1.13.11")
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
 
     // For testing Kotlin coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // For testing Robolectric
-    testImplementation("org.robolectric:robolectric:4.8.1")
+    testImplementation(libs.robolectric)
 
     // For Android Architecture Components testing
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation(libs.androidx.core.testing)
 }

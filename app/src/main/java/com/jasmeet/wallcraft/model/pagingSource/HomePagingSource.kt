@@ -2,6 +2,7 @@ package com.jasmeet.wallcraft.model.pagingSource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import com.jasmeet.wallcraft.model.repo.HomeRepo
 import retrofit2.HttpException
@@ -11,7 +12,7 @@ import javax.inject.Inject
 
 class HomePagingSource @Inject constructor(
     private val homeRepo: HomeRepo,
-    private val orderBy: String = "latest"
+    private val orderBy: String = OrderBy.LATEST.displayName
 ) : PagingSource<Int, HomeApiResponse>() {
     override fun getRefreshKey(state: PagingState<Int, HomeApiResponse>): Int? {
         return state.anchorPosition

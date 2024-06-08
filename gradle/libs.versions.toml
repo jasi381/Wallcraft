@@ -4,18 +4,26 @@ coilCompose = "2.6.0"
 composeloading = "1.0.4"
 constraintlayoutCompose = "1.0.1"
 converterGson = "2.11.0"
+coreTesting = "2.2.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
+kotlinxCoroutinesTest = "1.7.3"
 lifecycleRuntimeKtx = "2.8.0"
 activityCompose = "1.9.0"
 composeBom = "2024.05.00"
 fonts = "1.6.7"
 lottie = "6.4.0"
+mockitoCore = "3.12.4"
+mockitoKotlin = "2.2.0"
+mockkAgent = "1.13.11"
+mockkAndroid = "1.13.11"
 navigationCompose = "2.7.7"
 material-icons = "1.6.7"
+qrose = "1.0.1"
+robolectric = "4.8.1"
 roomPaging = "2.6.1"
 secrets = "2.0.1"
 room = "2.6.1"
@@ -38,6 +46,7 @@ firebaseBom = "33.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -57,6 +66,7 @@ androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedat
 #Design
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 googleFonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "fonts" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 materialIcons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material-icons" }
 composeloading = { module = "com.github.commandiron:ComposeLoading", version.ref = "composeloading" }
@@ -66,6 +76,10 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 #firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockitoKotlin" }
+mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
@@ -74,6 +88,8 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 #room
+qrose = { module = "io.github.alexzhirkevich:qrose", version.ref = "qrose" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 room = { module = "androidx.room:room-runtime", version.ref = "room" }
 roomCompiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 roomKtx = { module = "androidx.room:room-ktx", version.ref = "room" }
