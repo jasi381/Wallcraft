@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,9 +27,11 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,8 +48,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,6 +82,8 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
     val context = LocalContext.current
     val details = photographerDetailsViewModel.details.collectAsState()
     val photos = photographerDetailsViewModel.photos.collectAsState()
+    val bioExpanded = remember { mutableStateOf(false) }
+
 
     BackHandler {
         onBackClick.invoke()
@@ -98,7 +105,9 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                             text = it,
                             color = MaterialTheme.colorScheme.onBackground,
                             fontFamily = poppins,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 },
@@ -107,6 +116,28 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                         icon = R.drawable.ic_back,
                         onClick = { onBackClick.invoke() }
                     )
+                },
+                actions = {
+                    val instagramUsername = details.value?.results?.first()?.social?.instagramUsername
+                    val twitterUsername = details.value?.results?.first()?.social?.twitterUsername
+
+                    if (instagramUsername != null && twitterUsername != null) {
+                        // Display Twitter icon only
+                        IconButton(
+                            onClick =  { Utils.openUrlInBrowser(context, "https://www.twitter.com/$twitterUsername") }
+                        ) {
+                            Image(painter = painterResource(R.drawable.img_twitter), "")
+                        }
+                    } else if (instagramUsername != null) {
+                        // Display Instagram icon only
+                        IconButton(
+                            onClick =  { Utils.openUrlInBrowser(context, "https://www.instagram.com/$instagramUsername") }
+                        ) {
+                            Image(painter = painterResource(R.drawable.img_instagram), "")
+                        }
+                    }
+
+
                 },
                 scrollBehavior = scrollBehaviour
             )
@@ -128,8 +159,8 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                             rememberSharedContentState(key = "image-$url"),
                             animatedVisibilityScope,
                         )
-                        .padding(top = 15.dp)
-                        .size(90.dp)
+                        .padding(top = 10.dp)
+                        .size(140.dp)
                         .clip(CircleShape)
                         .align(Alignment.CenterHorizontally)
                         .border(2.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
@@ -137,69 +168,7 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                 )
 
             }
-            details.value?.results?.first()?.bio?.let {
-                TextComponent(
-                    text = it,
-                    textSize = 16.sp,
-                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp),
-                    maxLines = Int.MAX_VALUE,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            if (details.value?.results?.first()?.social?.instagramUsername != null || details.value?.results?.first()?.social?.twitterUsername != null)
-                TextComponent(
-                    text = "Social Profiles",
-                    fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(horizontal = 15.dp),
-                    textSize = 20.sp
-                )
 
-            details.value?.results?.first()?.social?.instagramUsername?.let {
-                ProfileTextComponent(
-                    title = "Instagram",
-                    value = it,
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 8.dp),
-                    onClick = {
-                        val instagramUrl = "https://www.instagram.com/$it"
-                        Utils.openUrlInBrowser(context, instagramUrl)
-                    },
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = poppins
-                    ),
-                    valueStyle = TextStyle(
-                        fontSize = 15.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = poppins
-                    )
-                )
-            }
-            details.value?.results?.first()?.social?.twitterUsername?.let {
-                ProfileTextComponent(
-                    title = "Twitter",
-                    value = it,
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 8.dp),
-                    onClick = {
-                        val twitterUrl = "https://www.twitter.com/$it"
-                        Utils.openUrlInBrowser(context, twitterUrl)
-                    },
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = poppins
-                    ),
-                    valueStyle = TextStyle(
-                        fontSize = 15.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = poppins
-                    )
-                )
-            }
 
             Row(
                 Modifier.fillMaxWidth(),
@@ -264,7 +233,6 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(3),
                 modifier = Modifier
-//                    .nestedScroll(scrollBehaviour.nestedScrollConnection)
                     .weight(1f)
                     .fillMaxSize()
                     .padding(horizontal = 8.dp),

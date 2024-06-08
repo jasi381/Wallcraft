@@ -9,9 +9,10 @@ plugins {
 }
 
 android {
+
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\Users\\Jasi\\StudioProjects\\Wallcraft\\keyStore.jks")
+            storeFile = file("C:\\Users\\User\\AndroidStudioProjects\\Wallcraft\\keyStore.jks")
             storePassword = "jasmeet34"
             keyAlias = "release"
             keyPassword = "jasmeet34"

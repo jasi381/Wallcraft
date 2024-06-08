@@ -117,12 +117,12 @@ fun CategoriesScreen(
         }
     ) {
         LazyColumn(
-            state = lazyListState, modifier = Modifier
+            state = lazyListState,
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
             items(categories.value.size) { index ->
-
                 Box(
                     modifier = Modifier
                         .customClickable {
