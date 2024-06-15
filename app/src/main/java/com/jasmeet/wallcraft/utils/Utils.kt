@@ -64,5 +64,9 @@ object Utils {
         context.startActivity(intent)
     }
 
+    fun getFirstWord(input: String): String {
+        return input.split(" ")[0]
+    }
+
 
 }

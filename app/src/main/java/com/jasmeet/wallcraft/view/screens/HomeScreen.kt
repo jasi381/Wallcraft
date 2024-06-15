@@ -36,13 +36,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,7 +57,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.OrderBy
-import com.jasmeet.wallcraft.model.ScrollDirection
 import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.view.appComponents.OrderByButton
 import com.jasmeet.wallcraft.view.theme.poppins
@@ -77,7 +71,6 @@ fun SharedTransitionScope.HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onImageClicked: (Pair<String, String>) -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
-    onScrollAction: (ScrollDirection) -> Unit,
 ) {
     val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
     val activity = (LocalContext.current as? Activity)
@@ -87,9 +80,6 @@ fun SharedTransitionScope.HomeScreen(
     val userInfo = loginSignUpViewModel.userInfo.collectAsState()
 
     val lazyListState = rememberLazyStaggeredGridState()
-    var lastScrollPosition by remember { mutableIntStateOf(0) }
-    var scrollDirection by remember { mutableStateOf(ScrollDirection.None) }
-
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     LaunchedEffect(Unit) {
@@ -103,26 +93,6 @@ fun SharedTransitionScope.HomeScreen(
         } else {
             activity?.finish()
         }
-    }
-
-
-    /**
-     *  This launched effect will observe the scroll direction which in
-     *  turn will manage the hiding of the bottom bar
-     */
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .collect { currentScrollPosition ->
-                scrollDirection = when {
-                    currentScrollPosition > lastScrollPosition -> ScrollDirection.Down
-                    currentScrollPosition < lastScrollPosition -> ScrollDirection.Up
-                    else -> ScrollDirection.None
-                }
-                lastScrollPosition = currentScrollPosition
-
-                onScrollAction(scrollDirection)
-            }
     }
 
     Scaffold(
@@ -219,7 +189,6 @@ fun SharedTransitionScope.HomeScreen(
                         .height(LocalConfiguration.current.screenHeightDp.dp)
                 ) {
                     LazyVerticalStaggeredGrid(
-                        state = lazyListState,
                         columns = StaggeredGridCells.Adaptive(150.dp),
                         modifier = Modifier
                             .fillMaxSize()
@@ -253,7 +222,7 @@ fun SharedTransitionScope.HomeScreen(
                                         ),
                                         animatedVisibilityScope = animatedVisibilityScope,
                                     )
-                                    .height(LocalConfiguration.current.screenWidthDp.dp * 2 / 3f)
+                                    .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                                     .clip(MaterialTheme.shapes.large)
                                     .clickable {
                                         onImageClicked(

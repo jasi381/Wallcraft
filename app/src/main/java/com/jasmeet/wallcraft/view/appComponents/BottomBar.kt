@@ -5,13 +5,15 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,6 +28,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
 import com.jasmeet.wallcraft.view.modifierExtensions.customClickable
+import com.jasmeet.wallcraft.view.theme.poppins
+import java.util.Locale
 
 
 @Composable
@@ -46,32 +50,17 @@ fun BottomBar(
 
     if (bottomBarDestination) {
 
-        Surface(
-            modifier = Modifier
-                .padding(horizontal = 15.dp, vertical = 8.dp)
-                .fillMaxWidth()
-                .navigationBarsPadding(),
-            color = Color(0xff725ffe),
-            shape = MaterialTheme.shapes.extraLarge,
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
+            screens.forEach { screen ->
+                AddBottomNavItem2(
+                    navHostController = navController,
+                    screen = screen,
+                    currentDestination = currentDestination
+                )
 
-            Row(
-                Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
-                screens.forEach { screen ->
-                    AddBottomNavItem(
-                        navHostController = navController,
-                        currentDestination = currentDestination,
-                        screen = screen,
-                        modifier = Modifier
-                            .weight(1f),
-                    )
-                }
             }
-
         }
     }
 }
@@ -116,4 +105,41 @@ fun AddBottomNavItem(
 
 }
 
+
+@Composable
+fun RowScope.AddBottomNavItem2(
+    navHostController: NavHostController,
+    screen: BottomBarScreen,
+    currentDestination: NavDestination?
+) {
+    NavigationBarItem(
+        colors = NavigationBarItemDefaults.colors(
+            indicatorColor = MaterialTheme.colorScheme.onSurface
+
+        ),
+        selected = currentDestination?.route == screen.route,
+        onClick = {
+            navHostController.navigate(screen.route) {
+                popUpTo(navHostController.graph.findStartDestination().id)
+                launchSingleTop = true
+            }
+        },
+        icon = {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = if (currentDestination?.route == screen.route) screen.selectedIcon else screen.unselectedIcon),
+                contentDescription = "Icon",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        },
+        label = {
+            Text(
+                text = screen.route.lowercase(Locale.ROOT)
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() },
+                color = MaterialTheme.colorScheme.onBackground,
+                fontFamily = poppins
+            )
+        }
+    )
+
+}
 
