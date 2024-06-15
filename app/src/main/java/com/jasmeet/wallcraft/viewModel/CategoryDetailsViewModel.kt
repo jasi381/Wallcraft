@@ -24,11 +24,11 @@ class CategoryDetailsViewModel @Inject constructor(
     private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
-    fun getCategoryDetails(id: String) {
+    fun getCategoryDetails(query: String, page: Int) {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val response = categoryDetailsRepo.getCategoryDetails(id)
+                val response = categoryDetailsRepo.getCategoryDetails(query, page)
                 _details.value = response
             } catch (e: Exception) {
                 _error.value = "Failed to fetch details: ${e.message}"

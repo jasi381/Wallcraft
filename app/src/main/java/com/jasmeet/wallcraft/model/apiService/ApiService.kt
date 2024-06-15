@@ -58,8 +58,8 @@ interface ApiService {
 
     @GET("search/photos")
     suspend fun getCategoryDetails(
-        @Query("page") page: Int = 1,
-        @Query("per_page") perPage: Int = 120,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int = 14,
         @Query("client_id") clientId: String = CLIENT_ID,
         @Query("query") query: String,
     ): CategoryDetailsApiResponse

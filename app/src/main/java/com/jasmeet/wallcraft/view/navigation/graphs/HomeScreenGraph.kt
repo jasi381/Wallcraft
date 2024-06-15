@@ -163,6 +163,9 @@ fun HomeNavGraph(
 
                 CategoryDetailsScreen(
                     name = name,
+                    onImageClicked = { pair ->
+                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+                    },
                     onBackClick = {
                         navController.navigateUp()
                     },

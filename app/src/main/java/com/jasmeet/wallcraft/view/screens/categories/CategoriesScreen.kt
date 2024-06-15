@@ -149,12 +149,6 @@ fun SharedTransitionScope.CategoriesScreen(
                     TextComponent(
                         text = formattedText,
                         modifier = Modifier
-                            .sharedElement(
-                                rememberSharedContentState(
-                                    key = "text-$formattedText"
-                                ),
-                                animatedVisibilityScope,
-                            )
                             .padding(10.dp)
                             .align(Alignment.BottomEnd)
                             .background(
