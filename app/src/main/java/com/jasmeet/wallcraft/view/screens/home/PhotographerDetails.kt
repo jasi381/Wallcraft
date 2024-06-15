@@ -1,4 +1,4 @@
-package com.jasmeet.wallcraft.view.screens
+package com.jasmeet.wallcraft.view.screens.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
@@ -31,7 +31,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +48,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,7 +58,6 @@ import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.NetworkImage
-import com.jasmeet.wallcraft.view.appComponents.ProfileTextComponent
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.PhotographerDetailsViewModel
@@ -82,8 +79,6 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
     val context = LocalContext.current
     val details = photographerDetailsViewModel.details.collectAsState()
     val photos = photographerDetailsViewModel.photos.collectAsState()
-    val bioExpanded = remember { mutableStateOf(false) }
-
 
     BackHandler {
         onBackClick.invoke()

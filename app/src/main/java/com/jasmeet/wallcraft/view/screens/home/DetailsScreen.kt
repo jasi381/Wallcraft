@@ -1,4 +1,4 @@
-package com.jasmeet.wallcraft.view.screens
+package com.jasmeet.wallcraft.view.screens.home
 
 import android.annotation.SuppressLint
 import android.widget.Toast

@@ -1,4 +1,4 @@
-package com.jasmeet.wallcraft.view.screens
+package com.jasmeet.wallcraft.view.screens.home
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -189,6 +189,7 @@ fun SharedTransitionScope.HomeScreen(
                         .height(LocalConfiguration.current.screenHeightDp.dp)
                 ) {
                     LazyVerticalStaggeredGrid(
+                        state = lazyListState,
                         columns = StaggeredGridCells.Adaptive(150.dp),
                         modifier = Modifier
                             .fillMaxSize()

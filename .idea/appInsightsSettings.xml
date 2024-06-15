@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.jasmeet.wallcraft" />
+                  <option name="mobileSdkAppId" value="1:940778894981:android:7d8b6b86d84c0953615bec" />
+                  <option name="projectId" value="wallcraft-40b2c" />
+                  <option name="projectNumber" value="940778894981" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

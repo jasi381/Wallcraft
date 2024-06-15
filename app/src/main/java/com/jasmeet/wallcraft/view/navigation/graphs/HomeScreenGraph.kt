@@ -16,16 +16,18 @@ import androidx.navigation.compose.rememberNavController
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
 import com.jasmeet.wallcraft.view.appComponents.BottomBar
 import com.jasmeet.wallcraft.view.navigation.Graph
+import com.jasmeet.wallcraft.view.navigation.categoryName
 import com.jasmeet.wallcraft.view.navigation.data
 import com.jasmeet.wallcraft.view.navigation.photographerName
 import com.jasmeet.wallcraft.view.navigation.photographerUrl
 import com.jasmeet.wallcraft.view.navigation.photographerUserName
-import com.jasmeet.wallcraft.view.screens.CategoriesScreen
-import com.jasmeet.wallcraft.view.screens.DetailsScreen
-import com.jasmeet.wallcraft.view.screens.HomeScreen
-import com.jasmeet.wallcraft.view.screens.PhotographerDetailsScreen
 import com.jasmeet.wallcraft.view.screens.SearchScreen
 import com.jasmeet.wallcraft.view.screens.SettingsScreen
+import com.jasmeet.wallcraft.view.screens.categories.CategoriesScreen
+import com.jasmeet.wallcraft.view.screens.categories.CategoryDetailsScreen
+import com.jasmeet.wallcraft.view.screens.home.DetailsScreen
+import com.jasmeet.wallcraft.view.screens.home.HomeScreen
+import com.jasmeet.wallcraft.view.screens.home.PhotographerDetailsScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -73,10 +75,14 @@ fun HomeNavGraph(
                 route = BottomBarScreen.Category.route
             ) {
                 CategoriesScreen(
-                    navController = navController,
-                    paddingValues = paddingValues
+                    onImageClicked = { title ->
+                        navController.navigate("${Graph.CATEGORY_DETAILS}/${title}")
+                    },
+                    paddingValues = paddingValues,
+                    animatedVisibilityScope = this@composable,
                 )
             }
+
             composable(
                 route = BottomBarScreen.Search.route
             ) {
@@ -96,7 +102,7 @@ fun HomeNavGraph(
                     data = data,
                     id = id,
                     onBackClick = {
-                        navController.popBackStack()
+                        navController.navigateUp()
                     },
                     animatedVisibilityScope = this@composable,
                     onProfileImageClick = { triple ->
@@ -129,15 +135,40 @@ fun HomeNavGraph(
                     url = url,
                     userName = userName,
                     onBackClick = {
-                        navController.popBackStack()
+                        navController.navigateUp()
                     },
                     animatedVisibilityScope = this@composable,
                     onImageClicked = { pair ->
                         navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
-
                     }
                 )
+            }
 
+            composable(
+                route = "${Graph.CATEGORY_DETAILS}/{$categoryName}",
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down,
+                        tween(700, easing = LinearEasing)
+                    )
+                },
+                popEnterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) { navBackStackEntry ->
+                val name = navBackStackEntry.arguments?.getString(categoryName)
+
+                CategoryDetailsScreen(
+                    name = name,
+                    onBackClick = {
+                        navController.navigateUp()
+                    },
+                    animatedVisibilityScope = this@composable,
+
+                    )
             }
         }
     }

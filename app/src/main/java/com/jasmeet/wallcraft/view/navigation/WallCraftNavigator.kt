@@ -12,6 +12,8 @@ const val id = "id"
 const val photographerName = "name"
 const val photographerUrl = "url"
 const val photographerUserName = "username"
+const val categoryName = "nam"
+
 
 
 @Composable
@@ -40,5 +42,7 @@ object Graph {
     const val DETAILS = "details/${data}/${id}"
     const val PHOTOGRAPHER_DETAILS =
         "photographer_details/{$photographerName}/${photographerUrl}/${photographerUserName}"
+
+    const val CATEGORY_DETAILS = "category_details/{$categoryName}"
 
 }

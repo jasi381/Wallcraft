@@ -27,7 +27,6 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val detailsRepo: DetailsRepo,
     @ApplicationContext private val context: Context,
-
     ) : ViewModel() {
 
     private val _details: MutableStateFlow<DetailsApiResponse?> = MutableStateFlow(null)

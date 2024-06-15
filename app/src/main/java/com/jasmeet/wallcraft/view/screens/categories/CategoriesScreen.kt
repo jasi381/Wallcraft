@@ -1,7 +1,11 @@
-package com.jasmeet.wallcraft.view.screens
+package com.jasmeet.wallcraft.view.screens.categories
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,33 +41,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
-import com.jasmeet.wallcraft.view.modifierExtensions.customClickable
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.CategoriesViewModel
 import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun CategoriesScreen(
-    navController: NavHostController,
+fun SharedTransitionScope.CategoriesScreen(
     categoriesViewModel: CategoriesViewModel = hiltViewModel(),
     loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
     paddingValues: PaddingValues,
+    animatedVisibilityScope: AnimatedContentScope,
+    onImageClicked: (String) -> Unit
 ) {
 
     val categories = categoriesViewModel.categories.collectAsState()
-
     val userInfo = loginSignUpViewModel.userInfo.collectAsState()
-
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -122,14 +122,14 @@ fun CategoriesScreen(
             ) { index ->
                 Box(
                     modifier = Modifier
-                        .customClickable {
-//                            TODO()
-                        }
                         .clip(MaterialTheme.shapes.large)
                         .fillMaxWidth()
                         .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                 ) {
-                    categories.value[index]?.coverPhoto?.urls?.smallS3?.let { img ->
+                    val data = categories.value[index]
+                    val formattedText = Utils.getFirstWord(data?.title.toString())
+
+                    data?.coverPhoto?.urls?.regular?.let { img ->
                         AsyncImage(
                             model = ImageRequest.Builder(context)
                                 .data(img)
@@ -139,39 +139,34 @@ fun CategoriesScreen(
                             contentScale = ContentScale.FillBounds,
                             contentDescription = null,
                             modifier = Modifier
-//                                .sharedElement(
-//                                    state = rememberSharedContentState(
-//                                        key = "image-${data[index]?.urls?.regular}"
-//                                    ),
-//                                    animatedVisibilityScope = animatedVisibilityScope,
-//                                )
                                 .fillMaxHeight()
                                 .clip(MaterialTheme.shapes.large)
-//                                .clickable {
-////                                    onImageClicked(
-////                                        Pair(encodedUrl, data[index]?.id.toString())
-////                                    )
-//                                }
-
+                                .clickable {
+                                    onImageClicked(formattedText)
+                                }
                         )
                     }
-                    categories.value[index]?.title?.let { title ->
-                        TextComponent(
-                            text = Utils.getFirstWord(title),
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .align(Alignment.BottomEnd)
-                                .background(
-                                    Color.Black.copy(alpha = 0.5f),
-                                    MaterialTheme.shapes.small
-                                )
-                                .padding(4.dp),
-                            textSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = poppins,
-                            textColor = Color.White
-                        )
-                    }
+                    TextComponent(
+                        text = formattedText,
+                        modifier = Modifier
+                            .sharedElement(
+                                rememberSharedContentState(
+                                    key = "text-$formattedText"
+                                ),
+                                animatedVisibilityScope,
+                            )
+                            .padding(10.dp)
+                            .align(Alignment.BottomEnd)
+                            .background(
+                                Color.Black.copy(alpha = 0.5f),
+                                MaterialTheme.shapes.small
+                            )
+                            .padding(4.dp),
+                        textSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = poppins,
+                        textColor = Color.White
+                    )
                 }
 
 

@@ -3,6 +3,7 @@ package com.jasmeet.wallcraft.model.apiService
 import com.jasmeet.wallcraft.BuildConfig
 import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.apiResponse.remote.categoriesApiResponse.CategoriesApiResponse
+import com.jasmeet.wallcraft.model.apiResponse.remote.categoryDetailsApiResponse.CategoryDetailsApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.photoGrapherPhotosApiResponse.PhotographerPhotosApiResponse
@@ -53,6 +54,15 @@ interface ApiService {
         @Query("order_by") orderBy: String = OrderBy.LATEST.displayName,
         @Query("client_id") clientId: String = CLIENT_ID,
         ): List<CategoriesApiResponse>
+
+
+    @GET("search/photos")
+    suspend fun getCategoryDetails(
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 120,
+        @Query("client_id") clientId: String = CLIENT_ID,
+        @Query("query") query: String,
+    ): CategoryDetailsApiResponse
 
 
 }
