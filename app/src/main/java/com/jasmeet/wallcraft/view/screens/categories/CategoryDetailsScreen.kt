@@ -28,7 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
+import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.LoaderView
 import com.jasmeet.wallcraft.view.appComponents.PageNumberSelector
 import com.jasmeet.wallcraft.view.theme.poppins
@@ -72,7 +73,7 @@ fun SharedTransitionScope.CategoryDetailsScreen(
     val error = categoryDetailsViewModel.error.collectAsState()
     val isLoading = categoryDetailsViewModel.loading.collectAsState()
 
-    var selectedPage by remember { mutableStateOf(1) }
+    var selectedPage by remember { mutableIntStateOf(1) }
     val gridState = rememberLazyStaggeredGridState()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -102,6 +103,16 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
+                },
+                navigationIcon = {
+                    IconTonalButtonComponent(
+                        icon = R.drawable.ic_back,
+                        modifier = Modifier
+                            .padding(end = 8.dp),
+                        onClick = {
+                            onBackClick.invoke()
+                        }
+                    )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background

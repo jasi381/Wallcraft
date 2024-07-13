@@ -146,18 +146,6 @@ fun HomeNavGraph(
 
             composable(
                 route = "${Graph.CATEGORY_DETAILS}/{$categoryName}",
-                exitTransition = {
-                    return@composable slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(700, easing = LinearEasing)
-                    )
-                },
-                popEnterTransition = {
-                    return@composable slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(700, easing = LinearEasing)
-                    )
-                }
             ) { navBackStackEntry ->
                 val name = navBackStackEntry.arguments?.getString(categoryName)
 
