@@ -13,7 +13,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\Users\\User\\Desktop\\Wallcraft\\keyStore.jks")
+            storeFile = file("C:\\Users\\User\\StudioProjects\\Wallcraft\\keyStore.jks")
             storePassword = "jasmeet34"
             keyAlias = "release"
             keyPassword = "jasmeet34"
@@ -43,7 +43,7 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            isDebuggable = true
+            isDebuggable = false
         }
     }
     compileOptions {

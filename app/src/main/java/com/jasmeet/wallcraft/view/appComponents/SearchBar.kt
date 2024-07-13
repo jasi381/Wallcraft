@@ -1,7 +1,11 @@
 package com.jasmeet.wallcraft.view.appComponents
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,8 +24,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.jasmeet.wallcraft.R
+import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.view.theme.pridi
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
@@ -32,38 +38,36 @@ fun SearchBar(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardType: KeyboardType = KeyboardType.Text,
     readyOnly: Boolean = false,
-    labelColor: Color = MaterialTheme.colorScheme.onSurface.copy(0.6f),
+    labelColor: Color = MaterialTheme.colorScheme.onBackground.copy(0.8f),
     shape: Shape = MaterialTheme.shapes.extraLarge,
-    fontFamily: FontFamily = pridi,
+    fontFamily: FontFamily = poppins,
     fontSize: TextUnit = 16.sp,
     enabled: Boolean = true,
-    onSearch: () -> Unit = {}
+    onClear: () -> Unit = {}
 ) {
     TextField(
         value = value,
         onValueChange = { onValueChange.invoke(it) },
         shape = shape,
         modifier = modifier,
-        colors = TextFieldDefaults.colors(
-            cursorColor = MaterialTheme.colorScheme.onSurface.copy(0.7f),
+        colors = TextFieldDefaults.textFieldColors(
+            cursorColor = MaterialTheme.colorScheme.onBackground.copy(0.7f),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.surface.copy(0.7f)
+            containerColor = MaterialTheme.colorScheme.surface.copy(0.7f)
         ),
         trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onSearch.invoke() }) {
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search_unselected),
-                        contentDescription = null
-                    )
-
+            Row {
+                if (value.isNotEmpty()) {
+                    IconButton(onClick = { onClear.invoke() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
-
         },
-
         placeholder = {
             if (labelValue != null)
                 Text(
@@ -75,7 +79,6 @@ fun SearchBar(
                     )
                 )
         },
-
         keyboardActions = keyboardActions,
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = false,
@@ -88,9 +91,8 @@ fun SearchBar(
         textStyle = TextStyle(
             fontFamily = fontFamily,
             fontSize = fontSize,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onBackground,
         ),
         enabled = enabled
     )
-
 }

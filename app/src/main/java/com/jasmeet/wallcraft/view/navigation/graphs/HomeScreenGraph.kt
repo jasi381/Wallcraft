@@ -55,7 +55,7 @@ fun HomeNavGraph(
 
     ) {
 
-    SharedTransitionLayout {
+    SharedTransitionLayout() {
         NavHost(
             navController = navController,
             route = Graph.HOME,
