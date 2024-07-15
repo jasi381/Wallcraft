@@ -1,64 +1,50 @@
 package com.jasmeet.wallcraft.viewModel
 
-//@HiltViewModel
-//class SearchViewModel @Inject constructor(
-//    private val repo: SearchRepo
-//) : ViewModel() {
-//
-//    private val _searchedResults: MutableStateFlow<PagingData<Photo>> =
-//        MutableStateFlow(PagingData.empty())
-//    val searchedResults = _searchedResults.asStateFlow()
-//
-//    private val _error = MutableStateFlow<String?>(null)
-//    val error: StateFlow<String?> get() = _error
-//
-//    private var currentQuery: String? = null
-//
-//    private val _query = MutableStateFlow("")
-//    val query: StateFlow<String> get() = _query
-//
-//    init {
-//        viewModelScope.launch {
-//            _query.collect { query ->
-//                if (query.isNotEmpty()) {
-//                    loadPhotos(query)
-//                }
-//            }
-//        }
-//    }
-//
-//    fun loadPhotos(query: String) {
-//        viewModelScope.launch {
-//            try {
-//                Pager(
-//                    config = PagingConfig(
-//                        pageSize = 10,
-//                        enablePlaceholders = true
-//                    ),
-//                    pagingSourceFactory = { SearchPagingSource(searchRepo = repo, query = query) }
-//                ).flow
-//                    .cachedIn(viewModelScope)
-//                    .collectLatest { results ->
-//                        _searchedResults.value = results
-//                        Log.d(
-//                            "SearchViewModel",
-//                            "Wallpapers loaded successfully: $results"
-//                        )
-//                    }
-//            } catch (e: Exception) {
-//                _error.value = "Failed to load movies: ${e.message}"
-//                Log.e("SearchMovieViewModel", "Error loading movies", e)
-//            }
-//        }
-//    }
-//
-//    fun retry() {
-//        currentQuery?.let(::loadPhotos)
-//    }
-//
-//    fun clearQuery() {
-//        currentQuery = null
-//        _query.value = ""
-//        _searchedResults.value = PagingData.empty()
-//    }
-//}
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.jasmeet.wallcraft.model.apiResponse.remote.categoryDetailsApiResponse.CategoryDetailsApiResponse
+import com.jasmeet.wallcraft.model.repo.CategoryDetailsRepo
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val categoryDetailsRepo: CategoryDetailsRepo
+) : ViewModel() {
+
+    private val _details: MutableStateFlow<CategoryDetailsApiResponse?> = MutableStateFlow(null)
+    val details = _details.asStateFlow()
+
+    private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
+    val error = _error.asStateFlow()
+
+    private val _loading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val loading = _loading.asStateFlow()
+
+    fun getSearchResults(query: String, page: Int) {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val response = categoryDetailsRepo.getCategoryDetails(query, page)
+                val currentResults = _details.value?.results?.toSet() ?: emptySet()
+                val newResults = response.results?.toSet() ?: emptySet()
+                val combinedResults = (currentResults + newResults).toList()
+
+                _details.value = _details.value?.copy(
+                    results = combinedResults
+                ) ?: response.copy(results = combinedResults)
+            } catch (e: Exception) {
+                _error.value = "Failed to fetch details: ${e.message}"
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun clearSearchResults() {
+        _details.value = null
+    }
+}

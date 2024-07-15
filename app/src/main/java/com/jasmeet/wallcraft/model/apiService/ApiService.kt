@@ -18,7 +18,6 @@ interface ApiService {
         const val CLIENT_ID = BuildConfig.client_id
     }
 
-
     @GET("photos")
     suspend fun getHomeScreenData(
         @Query("page") page: Int,

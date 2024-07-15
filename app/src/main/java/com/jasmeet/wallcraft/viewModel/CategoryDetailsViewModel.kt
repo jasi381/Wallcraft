@@ -29,7 +29,13 @@ class CategoryDetailsViewModel @Inject constructor(
             _loading.value = true
             try {
                 val response = categoryDetailsRepo.getCategoryDetails(query, page)
-                _details.value = response
+                val currentResults = _details.value?.results?.toSet() ?: emptySet()
+                val newResults = response.results?.toSet() ?: emptySet()
+                val combinedResults = (currentResults + newResults).toList()
+
+                _details.value = _details.value?.copy(
+                    results = combinedResults
+                ) ?: response.copy(results = combinedResults)
             } catch (e: Exception) {
                 _error.value = "Failed to fetch details: ${e.message}"
             } finally {

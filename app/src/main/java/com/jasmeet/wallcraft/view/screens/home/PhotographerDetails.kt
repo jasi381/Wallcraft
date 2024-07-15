@@ -1,6 +1,9 @@
 package com.jasmeet.wallcraft.view.screens.home
 
+import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -55,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.OrderBy
-import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.NetworkImage
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
@@ -119,14 +121,24 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                     if (instagramUsername != null && twitterUsername != null) {
                         // Display Twitter icon only
                         IconButton(
-                            onClick =  { Utils.openUrlInBrowser(context, "https://www.twitter.com/$twitterUsername") }
+                            onClick = {
+                                openTab(
+                                    context,
+                                    "https://www.twitter.com/$twitterUsername"
+                                )
+                            }
                         ) {
                             Image(painter = painterResource(R.drawable.img_twitter), "")
                         }
                     } else if (instagramUsername != null) {
                         // Display Instagram icon only
                         IconButton(
-                            onClick =  { Utils.openUrlInBrowser(context, "https://www.instagram.com/$instagramUsername") }
+                            onClick = {
+                                openTab(
+                                    context,
+                                    "https://www.instagram.com/$instagramUsername"
+                                )
+                            }
                         ) {
                             Image(painter = painterResource(R.drawable.img_instagram), "")
                         }
@@ -263,4 +275,14 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
 
         }
     }
+}
+
+fun openTab(context: Context, url: String) {
+
+    val packageName = "com.android.chrome"
+    val builder = CustomTabsIntent.Builder()
+    builder.setInstantAppsEnabled(true)
+    val customBuilder = builder.build()
+    customBuilder.intent.setPackage(packageName)
+    customBuilder.launchUrl(context, Uri.parse(url))
 }

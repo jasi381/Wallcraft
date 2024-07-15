@@ -35,16 +35,16 @@ fun HomeScreenGraph(
     navController: NavHostController = rememberNavController(),
 ) {
 
-        Scaffold(
-            bottomBar = {
-                BottomBar(navController = navController)
-            }
-        ) { paddingValues ->
-            HomeNavGraph(
-                navController = navController,
-                paddingValues = paddingValues
-            )
+    Scaffold(
+        bottomBar = {
+            BottomBar(navController = navController)
         }
+    ) { paddingValues ->
+        HomeNavGraph(
+            navController = navController,
+            paddingValues = paddingValues
+        )
+    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -55,7 +55,7 @@ fun HomeNavGraph(
 
     ) {
 
-    SharedTransitionLayout() {
+    SharedTransitionLayout {
         NavHost(
             navController = navController,
             route = Graph.HOME,
@@ -86,7 +86,12 @@ fun HomeNavGraph(
             composable(
                 route = BottomBarScreen.Search.route
             ) {
-                SearchScreen()
+                SearchScreen(
+                    animatedVisibilityScope = this@composable,
+                    onImageClicked = { pair ->
+                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+
+                    })
             }
 
             composable(

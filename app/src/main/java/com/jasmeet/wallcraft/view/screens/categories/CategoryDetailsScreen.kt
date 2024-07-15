@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,7 +31,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,11 +47,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
-import com.jasmeet.wallcraft.view.appComponents.LoaderView
-import com.jasmeet.wallcraft.view.appComponents.PageNumberSelector
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.CategoryDetailsViewModel
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -76,18 +73,24 @@ fun SharedTransitionScope.CategoryDetailsScreen(
     var selectedPage by remember { mutableIntStateOf(1) }
     val gridState = rememberLazyStaggeredGridState()
     val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = selectedPage) {
         name?.let { categoryDetailsViewModel.getCategoryDetails(it, selectedPage) }
     }
 
-    val shouldShowPagination by remember {
+    val shouldLoadMore by remember {
         derivedStateOf {
             val visibleItems = gridState.layoutInfo.visibleItemsInfo
             val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
             val totalItems = response.value?.results?.size ?: 0
-            totalItems > 0 && lastVisibleItemIndex >= totalItems - 1 // Show pagination when within 1 item from the end
+            totalItems > 0 && lastVisibleItemIndex >= totalItems - 1
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore && !isLoading.value) {
+            selectedPage++
+            categoryDetailsViewModel.getCategoryDetails(name.orEmpty(), selectedPage)
         }
     }
 
@@ -179,31 +182,17 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                     }
                 }
 
-                if (shouldShowPagination) {
+                if (isLoading.value) {
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
-
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            PageNumberSelector(
-                                selectedPage = selectedPage,
-                                onPageSelected = { page ->
-                                    selectedPage = page
-                                    scope.launch {
-                                        listState.scrollToItem(0)
-                                        gridState.scrollToItem(0)
-                                    }
-                                }
-                            )
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
                         }
-
                         Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
             }
-
-            if (isLoading.value) {
-                LoaderView()
-            }
         }
     }
 }
+

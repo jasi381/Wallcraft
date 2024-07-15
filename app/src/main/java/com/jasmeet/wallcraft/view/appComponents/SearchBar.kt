@@ -16,16 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.view.theme.poppins
-import com.jasmeet.wallcraft.view.theme.pridi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +36,7 @@ fun SearchBar(
     keyboardType: KeyboardType = KeyboardType.Text,
     readyOnly: Boolean = false,
     labelColor: Color = MaterialTheme.colorScheme.onBackground.copy(0.8f),
-    shape: Shape = MaterialTheme.shapes.extraLarge,
+    shape: Shape = MaterialTheme.shapes.large,
     fontFamily: FontFamily = poppins,
     fontSize: TextUnit = 16.sp,
     enabled: Boolean = true,
