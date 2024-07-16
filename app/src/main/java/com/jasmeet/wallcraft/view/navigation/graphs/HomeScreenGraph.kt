@@ -6,13 +6,28 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
 import com.jasmeet.wallcraft.view.appComponents.BottomBar
 import com.jasmeet.wallcraft.view.navigation.Graph
@@ -35,15 +50,35 @@ fun HomeScreenGraph(
     navController: NavHostController = rememberNavController(),
 ) {
 
+    val showAdsRoutes = listOf(
+        BottomBarScreen.Home.route,
+        BottomBarScreen.Category.route,
+        BottomBarScreen.Search.route,
+        BottomBarScreen.Settings.route
+    )
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry?.destination?.route
+
     Scaffold(
         bottomBar = {
             BottomBar(navController = navController)
         }
     ) { paddingValues ->
-        HomeNavGraph(
-            navController = navController,
-            paddingValues = paddingValues
-        )
+        Box(Modifier.fillMaxSize()) {
+            HomeNavGraph(
+                navController = navController,
+                paddingValues = paddingValues
+            )
+
+            if (currentDestination in showAdsRoutes) {
+                AdvertView(
+                    Modifier
+                        .align(androidx.compose.ui.Alignment.BottomCenter)
+                        .padding(paddingValues)
+                )
+            }
+
+        }
     }
 }
 
@@ -167,6 +202,35 @@ fun HomeNavGraph(
                     )
             }
         }
+    }
+}
+
+
+@Composable
+fun AdvertView(modifier: Modifier = Modifier) {
+    val isLoading = remember { mutableStateOf(true) }
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize(AdSize.BANNER)
+                    adUnitId = "ca-app-pub-3433847381318617/2588283396"
+                    adListener = object : AdListener() {
+                        override fun onAdLoaded() {
+                            isLoading.value = false
+                        }
+
+                        override fun onAdFailedToLoad(error: LoadAdError) {
+                            isLoading.value = false
+                        }
+                    }
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
+
     }
 }
 

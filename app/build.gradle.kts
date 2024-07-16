@@ -79,7 +79,16 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.runtime.livedata)
 
+    //testing dependencies
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core.testing)
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -96,7 +105,6 @@ dependencies {
     //shared Transition
     implementation(libs.androidx.animation)
     implementation(libs.androidx.foundation)
-
 
     // navigation
     implementation(libs.androidx.navigation.compose)
@@ -130,26 +138,11 @@ dependencies {
     implementation(libs.play.services.auth)
 
     //qr code generator
-    implementation("io.github.alexzhirkevich:qrose:1.0.1")
+    implementation(libs.qrose)
 
-    // Mockito for mocking dependencies
-    testImplementation("org.mockito:mockito-core:3.12.4")
+    //custom chrome tab
+    implementation(libs.androidx.browser)
 
-    // Mockito Kotlin for better Kotlin support
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-
-    // MockK
-    testImplementation("io.mockk:mockk-android:1.13.11")
-    testImplementation("io.mockk:mockk-agent:1.13.11")
-
-    // For testing Kotlin coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
-    // For testing Robolectric
-    testImplementation("org.robolectric:robolectric:4.8.1")
-
-    // For Android Architecture Components testing
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-
-    implementation("androidx.browser:browser:1.8.0")
+    //ads
+    implementation(libs.play.services.ads)
 }
