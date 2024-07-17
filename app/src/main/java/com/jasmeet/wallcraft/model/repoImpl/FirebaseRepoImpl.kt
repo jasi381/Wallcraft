@@ -46,4 +46,8 @@ class FirebaseRepoImpl(
             ?: throw IllegalStateException("User not found")
 
     }
+
+    override fun signOut() {
+        auth.signOut()
+    }
 }

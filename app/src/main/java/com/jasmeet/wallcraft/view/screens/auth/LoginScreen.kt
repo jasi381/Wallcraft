@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.jasmeet.wallcraft.view.screens.auth
 
 import androidx.compose.foundation.Image
@@ -5,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -131,6 +134,7 @@ fun LoginScreen(
         Column(
             Modifier
                 .fillMaxSize()
+                .imePadding()
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp, vertical = paddingValues.calculateTopPadding())

@@ -8,6 +8,7 @@ data class FavouritesEntity(
     @PrimaryKey
     val id: String,
     val photoUrl: String,
+    val lowQualityUrl: String,
     val photoData: ByteArray // New field for storing photo data as ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

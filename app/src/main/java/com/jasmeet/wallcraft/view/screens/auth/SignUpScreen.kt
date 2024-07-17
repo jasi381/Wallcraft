@@ -6,10 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -50,14 +50,12 @@ import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SignUpScreen(
-    navController: NavHostController,
-    loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel()
+    navController: NavHostController, loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel()
 ) {
 
-    var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
@@ -71,9 +69,8 @@ fun SignUpScreen(
     val scope = rememberCoroutineScope()
 
     BackHandler {
-        val navOptions = NavOptions.Builder()
-            .setPopUpTo(AuthScreen.SignUp.route, inclusive = true)
-            .build()
+        val navOptions =
+            NavOptions.Builder().setPopUpTo(AuthScreen.SignUp.route, inclusive = true).build()
         navController.navigate(AuthScreen.Login.route, navOptions)
     }
 
@@ -85,12 +82,11 @@ fun SignUpScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Column(
             Modifier
                 .fillMaxSize()
+                .imePadding()
                 .background(MaterialTheme.colorScheme.background)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp, vertical = paddingValues.calculateTopPadding())
@@ -114,9 +110,7 @@ fun SignUpScreen(
             )
 
             TextComponent(
-                text = "Email",
-                modifier = Modifier,
-                fontFamily = poppins
+                text = "Email", modifier = Modifier, fontFamily = poppins
             )
             InputFieldComponent(
                 value = email,
@@ -133,12 +127,9 @@ fun SignUpScreen(
             )
 
             TextComponent(
-                text = "Password",
-                modifier = Modifier,
-                fontFamily = poppins
+                text = "Password", modifier = Modifier, fontFamily = poppins
             )
-            PassWordTextFieldComponent(
-                value = password,
+            PassWordTextFieldComponent(value = password,
                 onValueChange = {
                     password = it
                 },
@@ -151,8 +142,7 @@ fun SignUpScreen(
                     focusManager.clearFocus()
                     validateAndInitiateSignUp(email, password, loginSignUpViewModel, navController)
 
-                }
-            )
+                })
 
 
             LoadingButton(
@@ -185,9 +175,9 @@ fun SignUpScreen(
                 textFontFamily = poppins,
                 subTextFontFamily = poppins,
                 onClick = {
-                    val navOptions = NavOptions.Builder()
-                        .setPopUpTo(AuthScreen.SignUp.route, inclusive = true)
-                        .build()
+                    val navOptions =
+                        NavOptions.Builder().setPopUpTo(AuthScreen.SignUp.route, inclusive = true)
+                            .build()
                     navController.navigate(AuthScreen.Login.route, navOptions)
                 },
                 underlineSubText = true
@@ -203,16 +193,11 @@ private fun validateAndInitiateSignUp(
     navController: NavHostController
 ) {
     if (Utils.validateEmail(email) && Utils.validatePassword(password)) {
-        loginSignUpViewModel.signUpEmailPassword(
-            email = email,
-            password,
-            onSignUp = {
-                val navOptions = NavOptions.Builder()
-                    .setPopUpTo(AuthScreen.SignUp.route, inclusive = true)
-                    .build()
-                navController.navigate(Graph.HOME, navOptions)
-            }
-        )
+        loginSignUpViewModel.signUpEmailPassword(email = email, password, onSignUp = {
+            val navOptions =
+                NavOptions.Builder().setPopUpTo(AuthScreen.SignUp.route, inclusive = true).build()
+            navController.navigate(Graph.HOME, navOptions)
+        })
 
     } else if (email.isEmpty()) {
         loginSignUpViewModel.setErrorMessage("Email is Empty")

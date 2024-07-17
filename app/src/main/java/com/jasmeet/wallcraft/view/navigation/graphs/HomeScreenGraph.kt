@@ -38,17 +38,22 @@ import com.jasmeet.wallcraft.view.navigation.photographerName
 import com.jasmeet.wallcraft.view.navigation.photographerUrl
 import com.jasmeet.wallcraft.view.navigation.photographerUserName
 import com.jasmeet.wallcraft.view.screens.SearchScreen
-import com.jasmeet.wallcraft.view.screens.SettingsScreen
 import com.jasmeet.wallcraft.view.screens.categories.CategoriesScreen
 import com.jasmeet.wallcraft.view.screens.categories.CategoryDetailsScreen
 import com.jasmeet.wallcraft.view.screens.home.DetailsScreen
 import com.jasmeet.wallcraft.view.screens.home.HomeScreen
 import com.jasmeet.wallcraft.view.screens.home.PhotographerDetailsScreen
+import com.jasmeet.wallcraft.view.screens.settings.DownloadsScreen
+import com.jasmeet.wallcraft.view.screens.settings.EditProfileScreen
+import com.jasmeet.wallcraft.view.screens.settings.FavouritesScreen
+import com.jasmeet.wallcraft.view.screens.settings.PrivacyPolicyScreen
+import com.jasmeet.wallcraft.view.screens.settings.SettingsScreen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreenGraph(
     navController: NavHostController = rememberNavController(),
+    onSignOut: () -> Unit
 ) {
 
     val showAdsRoutes = listOf(
@@ -67,7 +72,8 @@ fun HomeScreenGraph(
         Box(Modifier.fillMaxSize()) {
             HomeNavGraph(
                 navController = navController,
-                paddingValues = paddingValues
+                paddingValues = paddingValues,
+                onSignOut = onSignOut
             )
 
             if (currentDestination in showAdsRoutes) {
@@ -87,6 +93,7 @@ fun HomeScreenGraph(
 fun HomeNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
+    onSignOut: () -> Unit,
 
     ) {
 
@@ -106,6 +113,7 @@ fun HomeNavGraph(
                     animatedVisibilityScope = this@composable,
                 )
             }
+
             composable(
                 route = BottomBarScreen.Category.route
             ) {
@@ -132,7 +140,25 @@ fun HomeNavGraph(
             composable(
                 route = BottomBarScreen.Settings.route,
             ) {
-                SettingsScreen()
+                SettingsScreen(
+                    paddingValues = paddingValues,
+                    onSignOut = {
+                        onSignOut.invoke()
+                    },
+                    onFavourites = {
+                        navController.navigate(Graph.FAVOURITES)
+                    },
+                    onDownload = {
+                        navController.navigate(Graph.DOWNLOADS)
+                    },
+                    onEditProfile = {
+                        navController.navigate(Graph.EDIT_PROFILE)
+                    },
+                    onPrivacyPolicy = {
+                        navController.navigate(Graph.PRIVACY_POLICY)
+                    },
+                    animatedVisibilityScope = this@composable,
+                )
             }
 
             composable(route = "${Graph.DETAILS}/{$data}/{$id}/{$low_quality}") { navBackStackEntry ->
@@ -202,6 +228,104 @@ fun HomeNavGraph(
                     animatedVisibilityScope = this@composable,
 
                     )
+            }
+
+            composable(
+                route = Graph.FAVOURITES,
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        tween(700, easing = LinearEasing)
+                    )
+                },
+                enterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) {
+                FavouritesScreen(
+                    animatedVisibilityScope = this@composable,
+                    onBackClick = {
+                        navController.navigateUp()
+                    },
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
+                    }
+                )
+
+            }
+
+            composable(
+                route = Graph.DOWNLOADS,
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        tween(700, easing = LinearEasing)
+                    )
+                },
+                enterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) {
+                DownloadsScreen(
+                    animatedVisibilityScope = this@composable,
+                    onBackClick = {
+                        navController.navigateUp()
+                    },
+                )
+
+            }
+
+            composable(
+                route = Graph.EDIT_PROFILE,
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        tween(700, easing = LinearEasing)
+                    )
+                },
+                enterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) {
+                EditProfileScreen(
+                    animatedVisibilityScope = this@composable,
+                    onBackClick = {
+                        navController.navigateUp()
+                    },
+                )
+
+            }
+
+            composable(
+                route = Graph.PRIVACY_POLICY,
+                exitTransition = {
+                    return@composable slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Right,
+                        tween(700, easing = LinearEasing)
+                    )
+                },
+                enterTransition = {
+                    return@composable slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        tween(700, easing = LinearEasing)
+                    )
+                }
+            ) {
+                PrivacyPolicyScreen(
+                    animatedVisibilityScope = this@composable,
+                    onBackClick = {
+                        navController.navigateUp()
+                    }
+                )
             }
         }
     }

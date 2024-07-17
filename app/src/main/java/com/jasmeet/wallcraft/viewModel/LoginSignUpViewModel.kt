@@ -1,7 +1,9 @@
 package com.jasmeet.wallcraft.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthResult
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.userInfo.UserInfo
@@ -118,5 +120,21 @@ class LoginSignUpViewModel @Inject constructor(
                 setErrorMessage(e.message)
             }
         }
+    }
+
+    fun signOut(onSignOut: () -> Unit, googleSignInClient: GoogleSignInClient) {
+        _isLoading.value = true
+        try {
+            repository.signOut()
+            googleSignInClient.signOut()
+            onSignOut.invoke()
+
+        } catch (e: Exception) {
+            setErrorMessage(e.message)
+            Log.d("TAG", "signOut: ${e.message}")
+        } finally {
+            _isLoading.value = false
+        }
+
     }
 }

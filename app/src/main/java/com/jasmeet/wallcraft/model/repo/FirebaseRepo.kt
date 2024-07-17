@@ -9,4 +9,5 @@ interface FirebaseRepo {
     suspend fun saveUserInfo(authResult: AuthResult)
     suspend fun sendPasswordResetEmail(email: String)
     suspend fun fetchUserInfo(): UserInfo
+    fun signOut()
 }

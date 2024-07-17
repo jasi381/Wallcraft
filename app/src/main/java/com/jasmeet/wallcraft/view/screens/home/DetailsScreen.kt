@@ -226,6 +226,7 @@ fun SharedTransitionScope.DetailsScreen(
 
                     IconTonalButtonComponent(
                         icon = if (isFavourite) R.drawable.ic_fav_selected else R.drawable.ic_fav_unselected,
+
                         onClick = {
                             coroutine.launch(Dispatchers.IO) {
                                 val imageToBitmap = lowQuality?.let { Utils.getBitmapFromUrl(it) }
@@ -234,7 +235,8 @@ fun SharedTransitionScope.DetailsScreen(
                                 val favouritesEntity = FavouritesEntity(
                                     id = id ?: "",
                                     photoUrl = data ?: " ",
-                                    photoData = byteArray ?: ByteArray(0)
+                                    photoData = byteArray ?: ByteArray(0),
+                                    lowQualityUrl = lowQuality ?: ""
                                 )
 
                                 if (isFavourite) {

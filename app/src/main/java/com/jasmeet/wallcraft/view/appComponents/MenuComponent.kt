@@ -21,7 +21,8 @@ fun MenuItem(
     iconId: Int,
     text: String,
     endComponent: @Composable (() -> Unit)? = null,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    textModifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -44,7 +45,7 @@ fun MenuItem(
                 text = text,
                 textColor = MaterialTheme.colorScheme.onBackground,
                 fontFamily = poppins,
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = textModifier.padding(start = 8.dp)
             )
         }
 

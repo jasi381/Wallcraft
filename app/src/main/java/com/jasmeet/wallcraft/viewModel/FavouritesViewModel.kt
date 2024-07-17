@@ -24,7 +24,7 @@ class FavouritesViewModel @Inject constructor(
         getAllPhotos()
     }
 
-    private fun getAllPhotos() {
+    fun getAllPhotos() {
         viewModelScope.launch(Dispatchers.IO) {
             _favouritePhotos.postValue(repository.getAllPhotos())
         }

@@ -5,6 +5,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -37,11 +39,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -204,6 +208,17 @@ fun SharedTransitionScope.HomeScreen(
                                 it.toString()
                             }
                         ) { index ->
+                            val animatable = remember {
+                                Animatable(0.85f)
+                            }
+
+                            LaunchedEffect(key1 = true) {
+                                animatable.animateTo(
+                                    1f,
+                                    tween(350, delayMillis = 100, easing = LinearEasing)
+                                )
+
+                            }
 
                             val encodedUrl =
                                 URLEncoder.encode(data[index]?.urls?.regular, "UTF-8")
@@ -223,8 +238,12 @@ fun SharedTransitionScope.HomeScreen(
                                         state = rememberSharedContentState(
                                             key = "image-${data[index]?.urls?.regular}"
                                         ),
-                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        animatedVisibilityScope = animatedVisibilityScope
                                     )
+                                    .graphicsLayer {
+                                        this.scaleX = animatable.value
+                                        this.scaleY = animatable.value
+                                    }
                                     .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                                     .clip(MaterialTheme.shapes.large)
                                     .clickable {
