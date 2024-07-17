@@ -13,6 +13,7 @@ const val photographerName = "name"
 const val photographerUrl = "url"
 const val photographerUserName = "username"
 const val categoryName = "nam"
+const val low_quality = "low_quality"
 
 
 
@@ -39,7 +40,7 @@ object Graph {
     const val ROOT = "root_graph"
     const val AUTHENTICATION = "auth_graph"
     const val HOME = "home_graph"
-    const val DETAILS = "details/${data}/${id}"
+    const val DETAILS = "details/${data}/${id}${low_quality}"
     const val PHOTOGRAPHER_DETAILS =
         "photographer_details/{$photographerName}/${photographerUrl}/${photographerUserName}"
 

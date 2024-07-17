@@ -44,6 +44,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -69,7 +70,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.WallpaperType
+import com.jasmeet.wallcraft.model.apiResponse.local.FavouritesEntity
 import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
+import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.BottomSheetComponent
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.LoadingButton
@@ -78,6 +81,7 @@ import com.jasmeet.wallcraft.view.appComponents.TextComponent
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.DetailsViewModel
 import com.jasmeet.wallcraft.viewModel.DownloadViewModel
+import com.jasmeet.wallcraft.viewModel.FavouritesViewModel
 import com.jasmeet.wallcraft.viewModel.WallpaperViewModel
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrColors
@@ -88,7 +92,9 @@ import io.github.alexzhirkevich.qrose.options.brush
 import io.github.alexzhirkevich.qrose.options.circle
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -99,15 +105,26 @@ fun SharedTransitionScope.DetailsScreen(
     onBackClick: () -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
     id: String?,
+    lowQuality: String?,
     detailsViewModel: DetailsViewModel = hiltViewModel(),
     wallpaperViewModel: WallpaperViewModel = hiltViewModel(),
     downloadViewModel: DownloadViewModel = hiltViewModel(),
+    favouritesViewModel: FavouritesViewModel = hiltViewModel(),
     onProfileImageClick: (Triple<String, String, String>) -> Unit
 ) {
 
     val details = detailsViewModel.details.collectAsState()
     val isWallpaperLoading = wallpaperViewModel.isLoading.collectAsState()
     val isDownloading = downloadViewModel.isLoading.collectAsState()
+
+    var isFavourite by remember { mutableStateOf(false) }
+
+    LaunchedEffect(id) {
+        isFavourite = withContext(Dispatchers.IO) {
+            favouritesViewModel.isPhotoFavourite(id ?: "")
+        }
+    }
+
 
     LaunchedEffect(key1 = Unit) {
         id?.let { detailsViewModel.getDetails(it) }
@@ -173,7 +190,7 @@ fun SharedTransitionScope.DetailsScreen(
                 }
                 Column(
                     modifier = Modifier
-                        .padding(bottom = 95.dp)
+                        .padding(bottom = 95.dp, end = 10.dp)
                         .align(Alignment.BottomEnd),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -208,8 +225,30 @@ fun SharedTransitionScope.DetailsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     IconTonalButtonComponent(
-                        icon = R.drawable.ic_fav_unselected,
-                        onClick = {}
+                        icon = if (isFavourite) R.drawable.ic_fav_selected else R.drawable.ic_fav_unselected,
+                        onClick = {
+                            coroutine.launch(Dispatchers.IO) {
+                                val imageToBitmap = lowQuality?.let { Utils.getBitmapFromUrl(it) }
+                                val byteArray = imageToBitmap?.let { Utils.bitmapToByteArray(it) }
+
+                                val favouritesEntity = FavouritesEntity(
+                                    id = id ?: "",
+                                    photoUrl = data ?: " ",
+                                    photoData = byteArray ?: ByteArray(0)
+                                )
+
+                                if (isFavourite) {
+                                    favouritesViewModel.deletePhoto(favouritesEntity)
+                                } else {
+                                    favouritesViewModel.insertPhoto(favouritesEntity)
+                                }
+
+                                // Update UI state on the main thread
+                                withContext(Dispatchers.Main) {
+                                    isFavourite = !isFavourite
+                                }
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -258,26 +297,7 @@ fun SharedTransitionScope.DetailsScreen(
 
             }
         }
-        if (showWallpaperTypeSheet.value) {
-            WallpaperTypeBottomSheet(
-                showWallpaperTypeSheet,
-                coroutine,
-                sheetState,
-                isWallpaperLoading,
-                wallpaperViewModel,
-                data
-            )
-        }
-        if (showDownloadQualitySheet.value) {
-            ShowDownloadQualityBottomSheet(
-                showDownloadQualitySheet,
-                coroutine,
-                sheetState,
-                details,
-                downloadViewModel,
-                isDownloading
-            )
-        }
+
         if (showQrCode) {
             Dialog(onDismissRequest = {
                 showQrCode = false
@@ -315,6 +335,26 @@ fun SharedTransitionScope.DetailsScreen(
                 }
             }
         }
+    }
+    if (showWallpaperTypeSheet.value) {
+        WallpaperTypeBottomSheet(
+            showWallpaperTypeSheet,
+            coroutine,
+            sheetState,
+            isWallpaperLoading,
+            wallpaperViewModel,
+            data
+        )
+    }
+    if (showDownloadQualitySheet.value) {
+        ShowDownloadQualityBottomSheet(
+            showDownloadQualitySheet,
+            coroutine,
+            sheetState,
+            details,
+            downloadViewModel,
+            isDownloading
+        )
     }
 }
 
@@ -371,30 +411,6 @@ private fun ShowDownloadQualityBottomSheet(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LoadingButton(
-                    onClick = {
-                        details.value?.urls?.raw?.let {
-                            downloadViewModel.startDownload(
-                                it,
-                                onDownloadComplete = { message ->
-                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        }
-                        showDownloadQualitySheet.value = false
-                        coroutine.launch {
-                            sheetState.hide()
-                        }
-                    },
-                    loading = false,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .fillMaxWidth(),
-                    text = "Raw (Very High Quality)",
-                    textSize = 14.sp
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 LoadingButton(
                     onClick = {
@@ -415,7 +431,7 @@ private fun ShowDownloadQualityBottomSheet(
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth(),
-                    text = "Full (High Quality)",
+                    text = "High Quality",
                     textSize = 14.sp
                 )
 
@@ -440,7 +456,7 @@ private fun ShowDownloadQualityBottomSheet(
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth(),
-                    text = "Medium (Medium Quality)",
+                    text = "Medium Quality",
                     textSize = 14.sp
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -465,10 +481,10 @@ private fun ShowDownloadQualityBottomSheet(
                         .padding(horizontal = 10.dp)
                         .fillMaxWidth()
                         .navigationBarsPadding(),
-                    text = "Low (Low Quality)",
+                    text = "Low Quality",
                     textSize = 14.sp
                 )
-                Spacer(modifier = Modifier.height(46.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
             }
         }
@@ -542,7 +558,6 @@ private fun WallpaperTypeBottomSheet(
 
                 LoadingButton(
                     onClick = {
-
                         wallpaperViewModel.setWallpaperAndHandleLoading(
                             data.toString(),
                             WallpaperType.LOCK_SCREEN
@@ -597,12 +612,13 @@ private fun WallpaperTypeBottomSheet(
                     loading = false,
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
                     text = "Set as Lock & Home Screen Wallpaper",
                     textSize = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
             }
         }

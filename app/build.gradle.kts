@@ -43,7 +43,8 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            isDebuggable = false
+            //TODO:Change this after uploading to playstore
+            isDebuggable = true
         }
     }
     compileOptions {

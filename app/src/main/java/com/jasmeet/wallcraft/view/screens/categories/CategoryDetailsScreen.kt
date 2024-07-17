@@ -58,7 +58,7 @@ fun SharedTransitionScope.CategoryDetailsScreen(
     onBackClick: () -> Boolean,
     animatedVisibilityScope: AnimatedContentScope,
     categoryDetailsViewModel: CategoryDetailsViewModel = hiltViewModel(),
-    onImageClicked: (Pair<String, String>) -> Unit,
+    onImageClicked: (Triple<String, String, String>) -> Unit,
 ) {
     BackHandler {
         onBackClick.invoke()
@@ -154,6 +154,7 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                             ) { index ->
                                 val data = response.value?.results?.get(index)
                                 val encodedUrl = URLEncoder.encode(data?.urls?.regular, "UTF-8")
+                                val lowEncodedUrl = URLEncoder.encode(data?.urls?.small, "UTF-8")
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
                                         .data(data?.urls?.regular.toString())
@@ -173,7 +174,11 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                                         .clip(MaterialTheme.shapes.large)
                                         .clickable {
                                             onImageClicked(
-                                                Pair(encodedUrl, data?.id.toString())
+                                                Triple(
+                                                    encodedUrl,
+                                                    data?.id.toString(),
+                                                    lowEncodedUrl
+                                                )
                                             )
                                         }
                                 )

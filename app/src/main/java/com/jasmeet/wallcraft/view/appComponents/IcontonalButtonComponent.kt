@@ -38,7 +38,7 @@ fun IconTonalButtonComponent(
             contentDescription = "",
             modifier = Modifier
                 .padding(4.dp)
-                .size(45.dp),
+                .size(30.dp),
             tint = Color.Black.copy(0.8f)
         )
     }

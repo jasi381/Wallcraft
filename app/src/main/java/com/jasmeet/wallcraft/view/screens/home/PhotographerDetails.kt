@@ -74,7 +74,7 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
     animatedVisibilityScope: AnimatedContentScope,
     photographerDetailsViewModel: PhotographerDetailsViewModel = hiltViewModel(),
     userName: String?,
-    onImageClicked: (Pair<String, String>) -> Unit,
+    onImageClicked: (Triple<String, String, String>) -> Unit,
 ) {
 
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -249,6 +249,7 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                 items(photos.value) { response ->
 
                     val image = URLEncoder.encode(response?.urls?.regular, "UTF-8")
+                    val lowImage = URLEncoder.encode(response?.urls?.small, "UTF-8")
 
                     NetworkImage(
                         url = response?.urls?.regular.toString(),
@@ -263,7 +264,9 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                             .height(LocalConfiguration.current.screenHeightDp.dp * 0.25f)
                             .width(LocalConfiguration.current.screenWidthDp.dp * 0.26f)
                             .clickable {
-                                onImageClicked(Pair(image, response?.id.toString()))
+                                onImageClicked(
+                                    Triple(image, response?.id.toString(), lowImage)
+                                )
                             },
                         contentScale = ContentScale.FillBounds
                     )

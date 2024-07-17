@@ -75,7 +75,7 @@ fun SharedTransitionScope.SearchScreen(
 
     animatedVisibilityScope: AnimatedContentScope,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    onImageClicked: (Pair<String, String>) -> Unit,
+    onImageClicked: (Triple<String, String, String>) -> Unit,
 ) {
 
     val response = searchViewModel.details.collectAsState()
@@ -200,6 +200,9 @@ fun SharedTransitionScope.SearchScreen(
                                     val data = response.value?.results?.get(index)
                                     val encodedUrl =
                                         URLEncoder.encode(data?.urls?.regular, "UTF-8")
+
+                                    val encodedLowQuality =
+                                        URLEncoder.encode(data?.urls?.small, "UTF-8")
                                     AsyncImage(
                                         model = ImageRequest.Builder(context)
                                             .data(data?.urls?.regular.toString())
@@ -219,7 +222,11 @@ fun SharedTransitionScope.SearchScreen(
                                             .clip(MaterialTheme.shapes.large)
                                             .clickable {
                                                 onImageClicked(
-                                                    Pair(encodedUrl, data?.id.toString())
+                                                    Triple(
+                                                        encodedUrl,
+                                                        data?.id.toString(),
+                                                        encodedLowQuality
+                                                    )
                                                 )
                                             }
                                     )

@@ -1,6 +1,6 @@
 package com.jasmeet.wallcraft.view.appComponents
 
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -21,10 +21,11 @@ fun BottomSheetComponent(
 
     ) {
     ModalBottomSheet(
-        modifier = modifier.navigationBarsPadding(),
+        modifier = modifier,
         onDismissRequest = {
             onDismiss()
         },
+        windowInsets = WindowInsets(bottom = -120),
         sheetState = sheetState,
         shape = shape
     ) {

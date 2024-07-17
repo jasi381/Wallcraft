@@ -33,6 +33,7 @@ import com.jasmeet.wallcraft.view.appComponents.BottomBar
 import com.jasmeet.wallcraft.view.navigation.Graph
 import com.jasmeet.wallcraft.view.navigation.categoryName
 import com.jasmeet.wallcraft.view.navigation.data
+import com.jasmeet.wallcraft.view.navigation.low_quality
 import com.jasmeet.wallcraft.view.navigation.photographerName
 import com.jasmeet.wallcraft.view.navigation.photographerUrl
 import com.jasmeet.wallcraft.view.navigation.photographerUserName
@@ -54,7 +55,6 @@ fun HomeScreenGraph(
         BottomBarScreen.Home.route,
         BottomBarScreen.Category.route,
         BottomBarScreen.Search.route,
-        BottomBarScreen.Settings.route
     )
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route
@@ -100,8 +100,8 @@ fun HomeNavGraph(
                 route = BottomBarScreen.Home.route,
             ) {
                 HomeScreen(
-                    onImageClicked = { pair ->
-                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
                     },
                     animatedVisibilityScope = this@composable,
                 )
@@ -123,8 +123,8 @@ fun HomeNavGraph(
             ) {
                 SearchScreen(
                     animatedVisibilityScope = this@composable,
-                    onImageClicked = { pair ->
-                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
 
                     })
             }
@@ -135,12 +135,14 @@ fun HomeNavGraph(
                 SettingsScreen()
             }
 
-            composable(route = "${Graph.DETAILS}/{$data}/{$id}") { navBackStackEntry ->
+            composable(route = "${Graph.DETAILS}/{$data}/{$id}/{$low_quality}") { navBackStackEntry ->
                 val data = navBackStackEntry.arguments?.getString(data)
                 val id = navBackStackEntry.arguments?.getString(id.toString())
+                val lowQuality = navBackStackEntry.arguments?.getString(low_quality)
                 DetailsScreen(
                     data = data,
                     id = id,
+                    lowQuality = lowQuality,
                     onBackClick = {
                         navController.navigateUp()
                     },
@@ -178,8 +180,8 @@ fun HomeNavGraph(
                         navController.navigateUp()
                     },
                     animatedVisibilityScope = this@composable,
-                    onImageClicked = { pair ->
-                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
                     }
                 )
             }
@@ -191,8 +193,8 @@ fun HomeNavGraph(
 
                 CategoryDetailsScreen(
                     name = name,
-                    onImageClicked = { pair ->
-                        navController.navigate("${Graph.DETAILS}/${pair.first}/${pair.second}")
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second},/${triple.third}")
                     },
                     onBackClick = {
                         navController.navigateUp()

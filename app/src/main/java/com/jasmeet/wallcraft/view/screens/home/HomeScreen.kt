@@ -69,7 +69,7 @@ import java.net.URLEncoder
 fun SharedTransitionScope.HomeScreen(
     loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-    onImageClicked: (Pair<String, String>) -> Unit,
+    onImageClicked: (Triple<String, String, String>) -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
 ) {
     val selectedIndex = rememberSaveable { mutableIntStateOf(0) }
@@ -207,6 +207,8 @@ fun SharedTransitionScope.HomeScreen(
 
                             val encodedUrl =
                                 URLEncoder.encode(data[index]?.urls?.regular, "UTF-8")
+                            val encodedLowQuality =
+                                URLEncoder.encode(data[index]?.urls?.small, "UTF-8")
 
                             AsyncImage(
                                 model = ImageRequest.Builder(context)
@@ -227,7 +229,11 @@ fun SharedTransitionScope.HomeScreen(
                                     .clip(MaterialTheme.shapes.large)
                                     .clickable {
                                         onImageClicked(
-                                            Pair(encodedUrl, data[index]?.id.toString())
+                                            Triple(
+                                                encodedUrl,
+                                                data[index]?.id.toString(),
+                                                encodedLowQuality
+                                            )
                                         )
                                     }
 

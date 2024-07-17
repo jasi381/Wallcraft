@@ -6,12 +6,13 @@ import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jasmeet.wallcraft.model.apiService.ApiService
-import com.jasmeet.wallcraft.model.dao.PhotosDao
+import com.jasmeet.wallcraft.model.dao.FavouriteDao
 import com.jasmeet.wallcraft.model.database.AppDatabase
 import com.jasmeet.wallcraft.model.repo.CategoriesRepo
 import com.jasmeet.wallcraft.model.repo.CategoryDetailsRepo
 import com.jasmeet.wallcraft.model.repo.DetailsRepo
 import com.jasmeet.wallcraft.model.repo.DownloadRepo
+import com.jasmeet.wallcraft.model.repo.FavouritesRepo
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
 import com.jasmeet.wallcraft.model.repo.PhotographerPhotosRepo
@@ -21,6 +22,7 @@ import com.jasmeet.wallcraft.model.repoImpl.CategoriesRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.CategoryDetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.DetailsRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.DownloadRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.FavouritesRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.PhotographerPhotosRepoImpl
@@ -29,7 +31,6 @@ import com.jasmeet.wallcraft.model.repoImpl.WallpaperRepoImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -88,18 +89,23 @@ object AppModule {
     }
 
     @Provides
-    fun providesLocalDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "Photos_Database"
-        ).build()
+    @Singleton
+    fun provideDatabase(app: Application): AppDatabase {
+        return Room.databaseBuilder(app, AppDatabase::class.java, "app_database")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
-    fun providesPostDao(database: AppDatabase): PhotosDao {
-        return database.photoDao()
+    fun provideFavouriteDao(db: AppDatabase): FavouriteDao {
+        return db.favouriteDao()
     }
+
+    @Provides
+    fun provideFavouritesRepository(favouriteDao: FavouriteDao): FavouritesRepo {
+        return FavouritesRepoImpl(favouriteDao)
+    }
+
 
     @Provides
     @Singleton
