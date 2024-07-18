@@ -4,6 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -152,6 +156,19 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                                     it.toString()
                                 }
                             ) { index ->
+
+                                val animatable = remember {
+                                    Animatable(0.85f)
+                                }
+
+                                LaunchedEffect(key1 = true) {
+                                    animatable.animateTo(
+                                        1f,
+                                        tween(350, delayMillis = 100, easing = LinearEasing)
+                                    )
+
+                                }
+
                                 val data = response.value?.results?.get(index)
                                 val encodedUrl = URLEncoder.encode(data?.urls?.regular, "UTF-8")
                                 val lowEncodedUrl = URLEncoder.encode(data?.urls?.small, "UTF-8")
@@ -180,6 +197,10 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                                                     lowEncodedUrl
                                                 )
                                             )
+                                        }
+                                        .graphicsLayer {
+                                            this.scaleX = animatable.value
+                                            this.scaleY = animatable.value
                                         }
                                 )
                             }

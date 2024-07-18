@@ -29,13 +29,13 @@ fun OrderByButton(
             textSize = 16.sp,
             fontFamily = poppins,
             fontWeight = FontWeight.SemiBold,
-            textColor = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
+            textColor = if (isSelected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground.copy(
                 alpha = 0.6f
             ),
             modifier = Modifier
                 .background(
-                    if (isSelected) Color(0xff725ffe) else Color.Transparent,
-                    MaterialTheme.shapes.large
+                    if (isSelected) MaterialTheme.colorScheme.onBackground else Color.Transparent,
+                    MaterialTheme.shapes.medium
                 )
                 .padding(vertical = 2.dp, horizontal = 8.dp)
         )

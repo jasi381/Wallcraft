@@ -6,6 +6,6 @@ import com.jasmeet.wallcraft.model.apiResponse.local.FavouritesEntity
 import com.jasmeet.wallcraft.model.dao.FavouriteDao
 
 @Database(entities = [FavouritesEntity::class], version = 1, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
+abstract class FavouritesDatabase : RoomDatabase() {
     abstract fun favouriteDao(): FavouriteDao
 }

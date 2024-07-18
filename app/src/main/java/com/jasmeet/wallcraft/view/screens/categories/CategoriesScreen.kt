@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,10 +30,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -114,17 +119,36 @@ fun SharedTransitionScope.CategoriesScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalItemSpacing = 12.dp,
         ) {
+
+
             items(
                 categories.value.size,
                 key = {
                     it.toString()
                 }
             ) { index ->
+
+                val animatable = remember {
+                    Animatable(0.85f)
+                }
+
+                LaunchedEffect(key1 = true) {
+                    animatable.animateTo(
+                        1f,
+                        tween(350, delayMillis = 100, easing = LinearEasing)
+                    )
+
+                }
+
                 Box(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
                         .fillMaxWidth()
                         .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
+                        .graphicsLayer {
+                            this.scaleX = animatable.value
+                            this.scaleY = animatable.value
+                        }
                 ) {
                     val data = categories.value[index]
                     val formattedText = Utils.getFirstWord(data?.title.toString())

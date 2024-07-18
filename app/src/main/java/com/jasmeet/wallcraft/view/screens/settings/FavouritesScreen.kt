@@ -12,6 +12,8 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,7 +76,7 @@ fun SharedTransitionScope.FavouritesScreen(
     val context = LocalContext.current
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "")
 
     // Create an animated offset
     val scale by infiniteTransition.animateFloat(
@@ -124,7 +126,11 @@ fun SharedTransitionScope.FavouritesScreen(
             )
         }
     ) {
-        AnimatedVisibility(visible = data.value.isNullOrEmpty()) {
+        AnimatedVisibility(
+            visible = data.value.isNullOrEmpty(),
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
             Box(Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.align(Alignment.Center)) {
                     LottieComponent(rawRes = R.raw.empty, modifier = Modifier)
@@ -154,8 +160,8 @@ fun SharedTransitionScope.FavouritesScreen(
 
             items(
                 count = data.value.orEmpty().size,
-                key = {
-                    it.toString()
+                key = {keys->
+                    keys.toString()
                 }
             ) { index ->
                 val animatable = remember {
@@ -203,10 +209,8 @@ fun SharedTransitionScope.FavouritesScreen(
                                 )
                             )
                         }
-
                 )
             }
         }
-
     }
 }

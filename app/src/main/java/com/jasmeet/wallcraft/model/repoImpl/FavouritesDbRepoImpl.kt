@@ -2,12 +2,12 @@ package com.jasmeet.wallcraft.model.repoImpl
 
 import com.jasmeet.wallcraft.model.apiResponse.local.FavouritesEntity
 import com.jasmeet.wallcraft.model.dao.FavouriteDao
-import com.jasmeet.wallcraft.model.repo.FavouritesRepo
+import com.jasmeet.wallcraft.model.repo.FavouritesDbRepo
 import javax.inject.Inject
 
-class FavouritesRepoImpl @Inject constructor(
+class FavouritesDbRepoImpl @Inject constructor(
     private val favouriteDao: FavouriteDao
-) : FavouritesRepo {
+) : FavouritesDbRepo {
 
     override suspend fun insertPhoto(photo: FavouritesEntity) {
         favouriteDao.insertPhotos(photo)

@@ -133,8 +133,9 @@ fun HomeNavGraph(
                     animatedVisibilityScope = this@composable,
                     onImageClicked = { triple ->
                         navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
-
-                    })
+                    },
+                    paddingValues = paddingValues,
+                )
             }
 
             composable(
@@ -277,6 +278,9 @@ fun HomeNavGraph(
                     onBackClick = {
                         navController.navigateUp()
                     },
+                    onImageClicked = { triple ->
+                        navController.navigate("${Graph.DETAILS}/${triple.first}/${triple.second}/${triple.third}")
+                    }
                 )
 
             }

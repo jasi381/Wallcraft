@@ -70,6 +70,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.commandiron.compose_loading.Circle
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.WallpaperType
+import com.jasmeet.wallcraft.model.apiResponse.local.DownloadsEntity
 import com.jasmeet.wallcraft.model.apiResponse.local.FavouritesEntity
 import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.DetailsApiResponse
 import com.jasmeet.wallcraft.utils.Utils
@@ -416,6 +417,19 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
+                        val downloadEntity = DownloadsEntity(
+                            id = details.value?.id ?: "",
+                            photoUrl = details.value?.urls?.full ?: "",
+                            lowResPhotoUrl = details.value?.urls?.small ?: "",
+                            time = System.currentTimeMillis()
+                        )
+
+                        coroutine.launch(Dispatchers.IO) {
+                            downloadViewModel.insertPhoto(downloadEntity)
+                        }
+
+
+
                         details.value?.urls?.full?.let {
                             downloadViewModel.startDownload(
                                 it,
@@ -441,6 +455,19 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
+
+                        val downloadEntity = DownloadsEntity(
+                            id = details.value?.id ?: "",
+                            photoUrl = details.value?.urls?.regular ?: "",
+                            lowResPhotoUrl = details.value?.urls?.small ?: "",
+                            time = System.currentTimeMillis()
+                        )
+
+                        coroutine.launch(Dispatchers.IO) {
+                            downloadViewModel.insertPhoto(downloadEntity)
+                        }
+
+
                         details.value?.urls?.regular?.let {
                             downloadViewModel.startDownload(
                                 it,
@@ -465,6 +492,18 @@ private fun ShowDownloadQualityBottomSheet(
 
                 LoadingButton(
                     onClick = {
+
+                        val downloadEntity = DownloadsEntity(
+                            id = details.value?.id ?: "",
+                            photoUrl = details.value?.urls?.small ?: "",
+                            lowResPhotoUrl = details.value?.urls?.small ?: "",
+                            time = System.currentTimeMillis()
+                        )
+
+                        coroutine.launch(Dispatchers.IO) {
+                            downloadViewModel.insertPhoto(downloadEntity)
+                        }
+
                         details.value?.urls?.small?.let {
                             downloadViewModel.startDownload(
                                 it,

@@ -9,22 +9,18 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,11 +52,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.appComponents.NetworkImage
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
+import com.jasmeet.wallcraft.view.appComponents.ThreeDBlinkingBorderImage
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.PhotographerDetailsViewModel
 import java.net.URLEncoder
@@ -76,7 +75,6 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
     userName: String?,
     onImageClicked: (Triple<String, String, String>) -> Unit,
 ) {
-
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
     val details = photographerDetailsViewModel.details.collectAsState()
@@ -119,164 +117,154 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                     val twitterUsername = details.value?.results?.first()?.social?.twitterUsername
 
                     if (instagramUsername != null && twitterUsername != null) {
-                        // Display Twitter icon only
-                        IconButton(
-                            onClick = {
-                                openTab(
-                                    context,
-                                    "https://www.twitter.com/$twitterUsername"
-                                )
-                            }
-                        ) {
+                        IconButton(onClick = {
+                            openTab(
+                                context,
+                                "https://www.twitter.com/$twitterUsername"
+                            )
+                        }) {
                             Image(painter = painterResource(R.drawable.img_twitter), "")
                         }
                     } else if (instagramUsername != null) {
-                        // Display Instagram icon only
-                        IconButton(
-                            onClick = {
-                                openTab(
-                                    context,
-                                    "https://www.instagram.com/$instagramUsername"
-                                )
-                            }
-                        ) {
+                        IconButton(onClick = {
+                            openTab(
+                                context,
+                                "https://www.instagram.com/$instagramUsername"
+                            )
+                        }) {
                             Image(painter = painterResource(R.drawable.img_instagram), "")
                         }
                     }
-
-
                 },
                 scrollBehavior = scrollBehaviour
             )
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             Modifier
                 .nestedScroll(scrollBehaviour.nestedScrollConnection)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            url?.let {
-                NetworkImage(
-                    url = it,
+            item {
+                val painter = rememberAsyncImagePainter(
+                    ImageRequest
+                        .Builder(LocalContext.current)
+                        .data(data = url)
+                        .build()
+                )
+                ThreeDBlinkingBorderImage(
+                    painter = painter,
                     modifier = Modifier
                         .sharedElement(
                             rememberSharedContentState(key = "image-$url"),
                             animatedVisibilityScope,
                         )
-                        .padding(top = 10.dp)
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.CenterHorizontally)
-                        .border(2.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
-
+                        .size(110.dp),
+                    borderWidth = 5.dp
                 )
-
             }
 
-
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextComponent(
-                    text = "Photos",
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 15.dp, horizontal = 15.dp),
-                    textSize = 20.sp
-                )
-                Box(contentAlignment = Alignment.BottomEnd) {
-
-                    var expanded by remember { mutableStateOf(false) }
-
-
-                    IconTonalButtonComponent(
-                        icon = R.drawable.ic_sort,
-                        onClick = {
-                            expanded = true
-                        },
-                        size = 36
+            item {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextComponent(
+                        text = "Photos",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 15.dp, horizontal = 15.dp),
+                        textSize = 20.sp
                     )
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Latest") },
-                            onClick = {
-                                userName?.let {
-                                    photographerDetailsViewModel.getPhotos(
-                                        it,
-                                        OrderBy.LATEST.displayName
-                                    )
-                                }
-                                expanded = false
-                            }
+                    Box(contentAlignment = Alignment.BottomEnd) {
+                        var expanded by remember { mutableStateOf(false) }
+                        IconTonalButtonComponent(
+                            icon = R.drawable.ic_sort,
+                            onClick = { expanded = true },
+                            size = 36
                         )
-                        HorizontalDivider()
-                        DropdownMenuItem(
-                            text = { Text("Popular") },
-                            onClick = {
-                                userName?.let {
-                                    photographerDetailsViewModel.getPhotos(
-                                        it,
-                                        OrderBy.POPULAR.displayName
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "Latest",
+                                        color = MaterialTheme.colorScheme.onBackground
                                     )
+                                },
+                                onClick = {
+                                    userName?.let {
+                                        photographerDetailsViewModel.getPhotos(
+                                            it,
+                                            OrderBy.LATEST.displayName
+                                        )
+                                    }
+                                    expanded = false
                                 }
-                                expanded = false
-                            }
-                        )
-
-                    }
-
-                }
-            }
-
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(3),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp,
-            ) {
-                items(photos.value) { response ->
-
-                    val image = URLEncoder.encode(response?.urls?.regular, "UTF-8")
-                    val lowImage = URLEncoder.encode(response?.urls?.small, "UTF-8")
-
-                    NetworkImage(
-                        url = response?.urls?.regular.toString(),
-                        modifier = Modifier
-                            .sharedElement(
-                                state = rememberSharedContentState(
-                                    key = "image-${response?.urls?.regular}"
-                                ),
-                                animatedVisibilityScope = animatedVisibilityScope,
                             )
-                            .clip(MaterialTheme.shapes.large)
-                            .height(LocalConfiguration.current.screenHeightDp.dp * 0.25f)
-                            .width(LocalConfiguration.current.screenWidthDp.dp * 0.26f)
-                            .clickable {
-                                onImageClicked(
-                                    Triple(image, response?.id.toString(), lowImage)
-                                )
-                            },
-                        contentScale = ContentScale.FillBounds
-                    )
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "Popular",
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                },
+                                onClick = {
+                                    userName?.let {
+                                        photographerDetailsViewModel.getPhotos(
+                                            it,
+                                            OrderBy.POPULAR.displayName
+                                        )
+                                    }
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
-
-
             }
 
+            itemsIndexed(photos.value.chunked(3)) { _, rowPhotos ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rowPhotos.forEach { response ->
+                        val image = URLEncoder.encode(response?.urls?.regular, "UTF-8")
+                        val lowImage = URLEncoder.encode(response?.urls?.small, "UTF-8")
 
+                        NetworkImage(
+                            url = response?.urls?.regular.toString(),
+                            modifier = Modifier
+                                .sharedElement(
+                                    state = rememberSharedContentState(key = "image-${response?.urls?.regular}"),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                )
+                                .clip(MaterialTheme.shapes.large)
+                                .height(LocalConfiguration.current.screenHeightDp.dp * 0.25f)
+                                .weight(1f)
+                                .clickable {
+                                    onImageClicked(Triple(image, response?.id.toString(), lowImage))
+                                },
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    // Fill empty spaces in the last row
+                    repeat(3 - rowPhotos.size) {
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
         }
+
     }
 }
 

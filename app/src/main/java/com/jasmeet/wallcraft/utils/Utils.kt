@@ -8,9 +8,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Patterns
+import com.jasmeet.wallcraft.model.apiResponse.local.DownloadsEntity
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object Utils {
 
@@ -66,6 +70,15 @@ object Utils {
 
     fun getFirstWord(input: String): String {
         return input.split(" ")[0]
+    }
+
+    fun formatTimestampToDateString(timestamp: Long): String {
+        val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        return sdf.format(Date(timestamp))
+    }
+
+    fun groupItemsByDate(items: List<DownloadsEntity>): Map<String, List<DownloadsEntity>> {
+        return items.groupBy { formatTimestampToDateString(it.time) }
     }
 
 

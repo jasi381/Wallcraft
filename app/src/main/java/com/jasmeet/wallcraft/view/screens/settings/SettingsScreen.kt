@@ -4,34 +4,24 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -40,28 +30,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,18 +58,21 @@ import coil.request.ImageRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.jasmeet.wallcraft.R
+import com.jasmeet.wallcraft.view.appComponents.AnimatedTextSwitch
+import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
+import com.jasmeet.wallcraft.view.appComponents.BottomSheetComponent
 import com.jasmeet.wallcraft.view.appComponents.MenuItem
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
-import com.jasmeet.wallcraft.view.modifierExtensions.customClickable
+import com.jasmeet.wallcraft.view.appComponents.ThreeDBlinkingBorderImage
 import com.jasmeet.wallcraft.view.theme.poppins
-import com.jasmeet.wallcraft.viewModel.FavouritesViewModel
 import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.SettingsScreen(
     loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
-    favouritesViewModel: FavouritesViewModel = hiltViewModel(),
     paddingValues: PaddingValues,
     onSignOut: () -> Unit,
     onEditProfile: () -> Unit,
@@ -91,15 +82,13 @@ fun SharedTransitionScope.SettingsScreen(
     animatedVisibilityScope: AnimatedContentScope,
 ) {
     val userInfo by loginSignUpViewModel.userInfo.collectAsState()
-    var photoUri: Uri? by remember { mutableStateOf(null) }
-    val photos = favouritesViewModel.favouritePhotos.observeAsState()
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            photoUri = uri
-        }
+
+    val showAboutMeSheet = rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
 
     var theme by remember { mutableStateOf(false) }
     var showAds by remember { mutableStateOf(true) }
+    val coroutine = rememberCoroutineScope()
 
     val context = LocalContext.current
     val token = stringResource(R.string.default_web_client_id)
@@ -118,7 +107,7 @@ fun SharedTransitionScope.SettingsScreen(
     val painter = rememberAsyncImagePainter(
         ImageRequest
             .Builder(LocalContext.current)
-            .data(data = if (photoUri != null) photoUri else userInfo?.imgUrl)
+            .data(data = userInfo?.imgUrl)
             .build()
     )
 
@@ -170,11 +159,10 @@ fun SharedTransitionScope.SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
-                BlinkingBorderImage(
-                    painter,
-                    Modifier
-                        .size(90.dp),
-                    imgSize = 90.dp
+                ThreeDBlinkingBorderImage(
+                    painter = painter,
+                    modifier = Modifier.size(100.dp),
+                    borderWidth = 5.dp
                 )
             }
             item { Spacer(modifier = Modifier.height(12.dp)) }
@@ -314,33 +302,9 @@ fun SharedTransitionScope.SettingsScreen(
                         )
                         MenuItem(
                             iconId = R.drawable.ic_contact_us,
-                            text = "Contact Me",
+                            text = "About Me",
                             onClick = {
-                                val recipient = "sjasmeet438@gmail.com"
-                                val subject =
-                                    "Hey Jasmeet hope you are well. Just want to discuss about Wallcraft"
-
-                                val uriText = "mailto:$recipient" +
-                                        "?subject=" + Uri.encode(subject)
-
-                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = Uri.parse(uriText)
-                                }
-
-                                try {
-                                    context.startActivity(
-                                        Intent.createChooser(
-                                            emailIntent,
-                                            "Send email..."
-                                        )
-                                    )
-                                } catch (e: ActivityNotFoundException) {
-                                    Toast.makeText(
-                                        context,
-                                        "No email application found",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                showAboutMeSheet.value = true
                             }
                         )
 
@@ -382,76 +346,109 @@ fun SharedTransitionScope.SettingsScreen(
             item { Spacer(modifier = Modifier.height(8.dp)) }
 
         }
-    }
-}
-
-@Composable
-fun BlinkingBorderImage(painter: Painter, modifier: Modifier, imgSize: Dp) {
-    var animatedBorderAlpha by remember { mutableFloatStateOf(1f) }
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-
-    val borderColor = MaterialTheme.colorScheme.onBackground
-
-    animatedBorderAlpha = infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        ), label = ""
-    ).value
-
-    Box(modifier = modifier) {
-        Image(
-            painter = painter,
-            modifier = Modifier
-                .size(imgSize)
-                .clip(CircleShape)
-                .align(Alignment.Center),
-            contentScale = ContentScale.FillBounds,
-            contentDescription = null
-        )
-
-        Canvas(
-            modifier = Modifier
-                .size(imgSize)
-                .align(Alignment.Center)
-        ) {
-            drawCircle(
-                color = borderColor.copy(alpha = animatedBorderAlpha),
-                style = Stroke(width = 0.9.dp.toPx()),
-                radius = size.minDimension / 2
+        if (showAboutMeSheet.value) {
+            AboutMeSheet(
+                onDismiss = { showAboutMeSheet.value = false },
+                sheetState = sheetState,
+                coroutine = coroutine
             )
         }
     }
+
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnimatedTextSwitch(
-    isChecked: Boolean,
-    onCheckedChange: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabledText: String,
-    disabledText: String
+fun AboutMeSheet(
+    onDismiss: () -> Unit,
+    sheetState: SheetState,
+    coroutine: CoroutineScope
 ) {
-    AnimatedContent(
-        targetState = isChecked,
-        transitionSpec = {
-            slideInHorizontally(
-                initialOffsetX = { fullWidth -> fullWidth },
-                animationSpec = tween(durationMillis = 300)
-            ) togetherWith slideOutHorizontally(
-                targetOffsetX = { fullWidth -> -fullWidth },
-                animationSpec = tween(durationMillis = 300)
-            )
+
+    val context = LocalContext.current
+    BottomSheetComponent(
+        onDismiss = {
+            onDismiss()
+            coroutine.launch {
+                sheetState.hide()
+            }
         },
-        modifier = modifier.customClickable { onCheckedChange() }, label = ""
-    ) { targetState ->
-        TextComponent(
-            text = if (targetState) enabledText else disabledText,
-            textSize = 15.sp,
-            textColor = MaterialTheme.colorScheme.onBackground.copy(0.7f)
-        )
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            TextComponent(
+                text = "Jasmeet Singh",
+                textSize = 20.sp,
+                fontFamily = poppins,
+                fontWeight = FontWeight.Bold
+            )
+
+            TextComponent(
+                text = "Android Developer",
+                textSize = 15.sp,
+                fontFamily = poppins,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextComponent(
+                text = "Hi, I'm Jasmeet Singh, a passionate Android Developer with 1.3 years of experience in building high-quality mobile applications.\n\nI specialize in using Jetpack Compose, Kotlin, and modern Android development techniques to create user-friendly and efficient apps.",
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                textSize = 14.sp,
+                maxLines = Int.MAX_VALUE,
+                fontFamily = poppins,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Normal
+            )
+
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+            TextComponent(
+                text = "Connect with me via:",
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 8.dp),
+                textSize = 17.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            AnnotatedStringComponent(
+                modifier = Modifier,
+                text = "Mail:- ",
+                subText = "Gmail",
+                onClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:sjasmeet438@gmail.com")
+                        putExtra(Intent.EXTRA_SUBJECT, "email")
+                    }
+                    context.startActivity(intent)
+                },
+                underlineSubText = true
+            )
+
+            AnnotatedStringComponent(
+                modifier = Modifier.navigationBarsPadding(),
+                text = "LinkedIn:- ",
+                subText = "LinkedIn",
+                onClick = {
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://www.linkedin.com/in/jasmeetchawla")
+                    )
+                    context.startActivity(intent)
+                },
+                underlineSubText = true
+            )
+        }
     }
+
 }

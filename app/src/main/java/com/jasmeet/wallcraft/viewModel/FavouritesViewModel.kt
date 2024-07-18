@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jasmeet.wallcraft.model.apiResponse.local.FavouritesEntity
-import com.jasmeet.wallcraft.model.repo.FavouritesRepo
+import com.jasmeet.wallcraft.model.repo.FavouritesDbRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
-    private val repository: FavouritesRepo
+    private val repository: FavouritesDbRepo
 ) : ViewModel() {
 
     private val _favouritePhotos = MutableLiveData<List<FavouritesEntity>>()

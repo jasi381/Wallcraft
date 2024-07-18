@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,10 +73,10 @@ import java.net.URLEncoder
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.SearchScreen(
-
     animatedVisibilityScope: AnimatedContentScope,
     searchViewModel: SearchViewModel = hiltViewModel(),
     onImageClicked: (Triple<String, String, String>) -> Unit,
+    paddingValues: PaddingValues,
 ) {
 
     val response = searchViewModel.details.collectAsState()
@@ -173,7 +174,8 @@ fun SharedTransitionScope.SearchScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(bottom = paddingValues.calculateBottomPadding()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
 
@@ -185,7 +187,6 @@ fun SharedTransitionScope.SearchScreen(
                                 state = gridState,
                                 columns = StaggeredGridCells.Adaptive(150.dp),
                                 modifier = Modifier
-                                    .navigationBarsPadding()
                                     .fillMaxWidth()
                                     .padding(horizontal = 8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
