@@ -1,10 +1,11 @@
 package com.jasmeet.wallcraft.viewModel
 
 import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseUser
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.userInfo.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,7 +58,7 @@ class LoginSignUpViewModel @Inject constructor(
             try {
                 _isLoading.value = true
                 val result = repository.signUpWithEmailAndPassword(email, password)
-                repository.saveUserInfo(result)
+                result.user?.let { repository.saveUserInfo(it) }
                 _isLoading.value = false
                 onSignUp()
             } catch (e: Exception) {
@@ -96,11 +97,11 @@ class LoginSignUpViewModel @Inject constructor(
     }
 
     //This function will only be used when user tries to sign in with google
-    fun saveData(authResult: AuthResult) {
+    fun saveData(currentUser: FirebaseUser) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                repository.saveUserInfo(authResult)
+                repository.saveUserInfo(currentUser)
                 _isLoading.value = false
 
             } catch (e: Exception) {
@@ -122,11 +123,15 @@ class LoginSignUpViewModel @Inject constructor(
         }
     }
 
-    fun signOut(onSignOut: () -> Unit, googleSignInClient: GoogleSignInClient) {
+    fun signOut(onSignOut: () -> Unit, credentialManager: CredentialManager) {
         _isLoading.value = true
         try {
             repository.signOut()
-            googleSignInClient.signOut()
+            viewModelScope.launch {
+                credentialManager.clearCredentialState(
+                    ClearCredentialStateRequest()
+                )
+            }
             onSignOut.invoke()
 
         } catch (e: Exception) {

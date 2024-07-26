@@ -1,7 +1,8 @@
-@file:Suppress("DEPRECATION")
+
 
 package com.jasmeet.wallcraft.view.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -37,19 +38,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.utils.Utils
-import com.jasmeet.wallcraft.utils.rememberFirebaseAuthLauncher
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
 import com.jasmeet.wallcraft.view.appComponents.InputFieldComponent
 import com.jasmeet.wallcraft.view.appComponents.LoaderView
@@ -84,39 +87,8 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val token = stringResource(R.string.default_web_client_id)
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(token)
-            .requestEmail()
-            .requestProfile()
-            .build()
-    }
+    val credentialManager = CredentialManager.create(context)
 
-    val googleSignInClient = remember {
-        GoogleSignIn.getClient(context, gso)
-    }
-
-    val launcher = rememberFirebaseAuthLauncher(
-        onAuthComplete = { result ->
-            googleLoading = false
-            loginSignUpViewModel.saveData(result)
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(AuthScreen.Login.route, inclusive = true)
-                .build()
-
-            navController.navigate(Graph.HOME, navOptions)
-
-
-        },
-        onAuthError = { error ->
-            googleLoading = false
-            error.let {
-                loginSignUpViewModel.setErrorMessage(it)
-            }
-
-        }
-    )
 
     LaunchedEffect(errorMessage) {
         if (errorMessage?.isNotEmpty() == true) {
@@ -260,7 +232,50 @@ fun LoginScreen(
             ElevatedCard(
                 onClick = {
                     googleLoading = true
-                    launcher.launch(googleSignInClient.signInIntent)
+                    val googleIdOptions = GetGoogleIdOption.Builder()
+                        .setFilterByAuthorizedAccounts(false)
+                        .setServerClientId(context.getString(R.string.default_web_client_id))
+                        .build()
+
+                    val request = GetCredentialRequest.Builder()
+                        .addCredentialOption(googleIdOptions)
+                        .build()
+
+                    scope.launch {
+                        try {
+                            val result = credentialManager.getCredential(
+                                context = context,
+                                request = request
+                            )
+                            val credential = result.credential
+                            val googleIdTokenCredential =
+                                GoogleIdTokenCredential.createFrom(credential.data)
+
+                            val googleIdToken = googleIdTokenCredential.idToken
+
+                            val firebaseCredential =
+                                GoogleAuthProvider.getCredential(googleIdToken, null)
+
+                            val auth = FirebaseAuth.getInstance()
+
+                            auth.signInWithCredential(firebaseCredential)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+
+                                        googleLoading = false
+                                        auth.currentUser?.let { loginSignUpViewModel.saveData(it) }
+                                        val navOptions = NavOptions.Builder()
+                                            .setPopUpTo(AuthScreen.Login.route, inclusive = true)
+                                            .build()
+
+                                        navController.navigate(Graph.HOME, navOptions)
+                                    }
+                                }
+
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 },
                 elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                 shape = CircleShape,

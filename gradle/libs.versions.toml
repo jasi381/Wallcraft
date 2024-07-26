@@ -12,8 +12,8 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesTest = "1.7.3"
-lifecycleRuntimeKtx = "2.8.3"
-activityCompose = "1.9.0"
+lifecycleRuntimeKtx = "2.8.4"
+activityCompose = "1.9.1"
 composeBom = "2024.06.00"
 fonts = "1.6.8"
 lottie = "6.4.0"
@@ -35,16 +35,17 @@ hilt-android-compiler = "1.2.0"
 hiltVersion = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 kspVersion = "2.0.0-1.0.21"
-pagingRuntimeKtx = "3.3.0"
-animationCompose = "1.7.0-beta05"
-foundationCompose = "1.7.0-beta05"
+pagingRuntimeKtx = "3.3.1"
+animationCompose = "1.7.0-beta06"
+foundationCompose = "1.7.0-beta06"
 runtimeLivedata = "1.6.8"
 playServicesAuth = "21.2.0"
 firebaseAuth = "23.0.0"
 googleServices = "4.4.2"
 gms-services = "4.4.2"
 firebaseBom = "33.1.2"
-
+credentials = "1.2.2"
+googleid = "1.1.1"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -81,6 +82,12 @@ play-services-ads = { module = "com.google.android.gms:play-services-ads", versi
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+
+#credential Manager
+#noinspection CredentialDependency
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 #navigation Compose
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

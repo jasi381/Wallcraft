@@ -47,16 +47,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.view.appComponents.AnimatedTextSwitch
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
@@ -91,18 +89,7 @@ fun SharedTransitionScope.SettingsScreen(
     val coroutine = rememberCoroutineScope()
 
     val context = LocalContext.current
-    val token = stringResource(R.string.default_web_client_id)
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(token)
-            .requestEmail()
-            .requestProfile()
-            .build()
-    }
-    val googleSignInClient = remember {
-        GoogleSignIn.getClient(context, gso)
-    }
-
+    val credentialManager = CredentialManager.create(context)
 
     val painter = rememberAsyncImagePainter(
         ImageRequest
@@ -137,7 +124,7 @@ fun SharedTransitionScope.SettingsScreen(
                                 onSignOut = {
                                     onSignOut()
                                 },
-                                googleSignInClient = googleSignInClient
+                                credentialManager = credentialManager
                             )
                         }
                     ) {

@@ -3,6 +3,7 @@ package com.jasmeet.wallcraft.viewmodels
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jasmeet.wallcraft.MainDispatcherRule
 import com.jasmeet.wallcraft.model.repo.DownloadRepo
+import com.jasmeet.wallcraft.model.repo.DownloadsDbRepo
 import com.jasmeet.wallcraft.viewModel.DownloadViewModel
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -38,12 +39,14 @@ class DownloadViewModelTest {
 
     private lateinit var viewModel: DownloadViewModel
     private lateinit var downloadRepo: DownloadRepo
+    private lateinit var downloadDbRepo: DownloadsDbRepo
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
         downloadRepo = mockk()
-        viewModel = DownloadViewModel(downloadRepo)
+        downloadDbRepo = mockk()
+        viewModel = DownloadViewModel(downloadRepo, downloadDbRepo)
     }
 
     @After

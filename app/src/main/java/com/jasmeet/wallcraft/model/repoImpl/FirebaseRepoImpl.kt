@@ -2,6 +2,7 @@ package com.jasmeet.wallcraft.model.repoImpl
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jasmeet.wallcraft.model.Collections
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
@@ -23,8 +24,8 @@ class FirebaseRepoImpl(
         return auth.createUserWithEmailAndPassword(email, password).await()
     }
 
-    override suspend fun saveUserInfo(authResult: AuthResult) {
-        val user = authResult.user ?: return
+    override suspend fun saveUserInfo(currentUser: FirebaseUser) {
+        val user = currentUser ?: return
         db.collection(Collections.USER_COLLECTION).document(user.uid).set(
             UserInfo(
                 name = user.displayName ?: user.email.toString().substringBefore("@"),
