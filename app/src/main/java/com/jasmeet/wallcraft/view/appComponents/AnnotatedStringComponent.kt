@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.view.appComponents
 
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,7 +17,7 @@ import com.jasmeet.wallcraft.view.theme.pridi
 
 @Composable
 fun AnnotatedStringComponent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     text: String,
     subText: String,
     textColor: Color = Color.White,
@@ -60,14 +61,13 @@ fun AnnotatedStringComponent(
         }
     }
 
-    ClickableText(
+    Text(
         text = annotatedString,
-        onClick = { offset ->
-            annotatedString.getStringAnnotations("Clickable", offset, offset)
+        modifier = modifier.clickable {
+            annotatedString.getStringAnnotations("Clickable", 0, annotatedString.length)
                 .firstOrNull()?.let {
                     onClick()
                 }
-        },
-        modifier = modifier
+        }
     )
 }

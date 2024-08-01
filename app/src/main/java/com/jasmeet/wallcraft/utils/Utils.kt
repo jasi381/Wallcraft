@@ -72,14 +72,13 @@ object Utils {
         return input.split(" ")[0]
     }
 
-    fun formatTimestampToDateString(timestamp: Long): String {
+    private fun formatTimestampToDateString(timestamp: Long): String {
         val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         return sdf.format(Date(timestamp))
     }
 
     fun groupItemsByDate(items: List<DownloadsEntity>): Map<String, List<DownloadsEntity>> {
-        return items.groupBy { formatTimestampToDateString(it.time) }
+        return items.reversed().groupBy { formatTimestampToDateString(it.time) }
     }
-
 
 }

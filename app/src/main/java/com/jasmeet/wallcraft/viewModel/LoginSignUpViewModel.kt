@@ -1,11 +1,17 @@
 package com.jasmeet.wallcraft.viewModel
 
+import android.content.Context
 import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.FirebaseAuth.getInstance
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.userInfo.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,6 +70,58 @@ class LoginSignUpViewModel @Inject constructor(
             } catch (e: Exception) {
                 setErrorMessage(e.message)
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun signInWithGoogle(
+        googleIdOptions: GetGoogleIdOption,
+        context: Context,
+        onSuccess: () -> Unit,
+    ) {
+        _isLoading.value = true
+        val credentialManager = CredentialManager.create(context)
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOptions)
+            .build()
+
+
+
+        viewModelScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    context = context,
+                    request = request
+                )
+
+                val credential = result.credential
+
+                val googleIdTokenCredential =
+                    GoogleIdTokenCredential.createFrom(credential.data)
+
+                val googleIdToken = googleIdTokenCredential.idToken
+
+                val firebaseCredential =
+                    GoogleAuthProvider.getCredential(googleIdToken, null)
+
+                val auth = getInstance()
+
+                auth.signInWithCredential(firebaseCredential)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            _isLoading.value = false
+                            auth.currentUser?.let { saveData(it) }
+                            onSuccess()
+                        } else {
+                            setErrorMessage(task.exception?.message)
+                            _isLoading.value = false
+
+                        }
+                    }
+
+
+            } catch (e: Exception) {
+                setErrorMessage(e.message)
             }
         }
     }

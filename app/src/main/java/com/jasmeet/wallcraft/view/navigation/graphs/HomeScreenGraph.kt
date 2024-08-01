@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.view.navigation.graphs
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -29,6 +30,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.jasmeet.wallcraft.model.bottomBarItems.BottomBarScreen
+import com.jasmeet.wallcraft.utils.DataStoreUtil
 import com.jasmeet.wallcraft.view.appComponents.BottomBar
 import com.jasmeet.wallcraft.view.navigation.Graph
 import com.jasmeet.wallcraft.view.navigation.categoryName
@@ -37,6 +39,8 @@ import com.jasmeet.wallcraft.view.navigation.low_quality
 import com.jasmeet.wallcraft.view.navigation.photographerName
 import com.jasmeet.wallcraft.view.navigation.photographerUrl
 import com.jasmeet.wallcraft.view.navigation.photographerUserName
+import com.jasmeet.wallcraft.view.navigation.transitions.enterTransition
+import com.jasmeet.wallcraft.view.navigation.transitions.exitTransition
 import com.jasmeet.wallcraft.view.screens.SearchScreen
 import com.jasmeet.wallcraft.view.screens.categories.CategoriesScreen
 import com.jasmeet.wallcraft.view.screens.categories.CategoryDetailsScreen
@@ -53,7 +57,9 @@ import com.jasmeet.wallcraft.view.screens.settings.SettingsScreen
 @Composable
 fun HomeScreenGraph(
     navController: NavHostController = rememberNavController(),
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    dataStoreUtil: DataStoreUtil,
+    theme: Boolean
 ) {
 
     val showAdsRoutes = listOf(
@@ -73,7 +79,9 @@ fun HomeScreenGraph(
             HomeNavGraph(
                 navController = navController,
                 paddingValues = paddingValues,
-                onSignOut = onSignOut
+                onSignOut = onSignOut,
+                dataStoreUtil = dataStoreUtil,
+                theme = theme
             )
 
             if (currentDestination in showAdsRoutes) {
@@ -94,6 +102,8 @@ fun HomeNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     onSignOut: () -> Unit,
+    dataStoreUtil: DataStoreUtil,
+    theme: Boolean,
 
     ) {
 
@@ -122,7 +132,6 @@ fun HomeNavGraph(
                         navController.navigate("${Graph.CATEGORY_DETAILS}/${title}")
                     },
                     paddingValues = paddingValues,
-                    animatedVisibilityScope = this@composable,
                 )
             }
 
@@ -143,6 +152,8 @@ fun HomeNavGraph(
             ) {
                 SettingsScreen(
                     paddingValues = paddingValues,
+                    dataStoreUtil = dataStoreUtil,
+                    theme = theme,
                     onSignOut = {
                         onSignOut.invoke()
                     },
@@ -215,6 +226,12 @@ fun HomeNavGraph(
 
             composable(
                 route = "${Graph.CATEGORY_DETAILS}/{$categoryName}",
+                enterTransition = {
+                    enterTransition()
+                },
+                exitTransition = {
+                    exitTransition()
+                }
             ) { navBackStackEntry ->
                 val name = navBackStackEntry.arguments?.getString(categoryName)
 
@@ -354,6 +371,8 @@ fun AdvertView(modifier: Modifier = Modifier) {
 
                         override fun onAdFailedToLoad(error: LoadAdError) {
                             isLoading.value = false
+                            super.onAdFailedToLoad(error)
+                            Log.d("AdvertView", "onAdFailedToLoad: $error.message")
                         }
                     }
                     loadAd(AdRequest.Builder().build())

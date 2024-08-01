@@ -1,5 +1,5 @@
 [versions]
-agp = "8.4.2"
+agp = "8.5.1"
 browser = "1.8.0"
 coilCompose = "2.6.0"
 composeloading = "1.0.4"
@@ -46,6 +46,8 @@ gms-services = "4.4.2"
 firebaseBom = "33.1.2"
 credentials = "1.2.2"
 googleid = "1.1.1"
+dataStore = "1.1.1"
+
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -122,6 +124,9 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 #Paging
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingRuntimeKtx" }
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
+
+#Datastore
+androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "dataStore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

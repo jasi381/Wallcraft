@@ -8,26 +8,19 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,13 +58,12 @@ import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.view.appComponents.OrderByButton
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.HomeViewModel
-import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SharedTransitionScope.HomeScreen(
-    loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     onImageClicked: (Triple<String, String, String>) -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
@@ -81,14 +73,9 @@ fun SharedTransitionScope.HomeScreen(
     val data = homeViewModel.homeData.collectAsLazyPagingItems()
     val error = homeViewModel.error.collectAsState()
     val context = LocalContext.current
-    val userInfo = loginSignUpViewModel.userInfo.collectAsState()
 
-    val lazyListState = rememberLazyStaggeredGridState()
+    val lazyListState = rememberLazyListState()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    LaunchedEffect(Unit) {
-        loginSignUpViewModel.getUserInfo()
-    }
 
     BackHandler {
         if (selectedIndex.intValue == 1) {
@@ -114,19 +101,6 @@ fun SharedTransitionScope.HomeScreen(
                         fontWeight = FontWeight.SemiBold,
                     )
                 },
-                navigationIcon = {
-                    AsyncImage(
-                        model = userInfo.value?.imgUrl,
-                        contentDescription = "userInfo",
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(38.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = R.drawable.img_placeholder)
-
-                    )
-                },
                 scrollBehavior = scrollBehaviour
             )
         }
@@ -139,27 +113,15 @@ fun SharedTransitionScope.HomeScreen(
                 NoInternetView(error = error.value!!)
             }
         } else {
-            Column(
-                Modifier
-                    .offset(
-                        y = (-12).dp
-                    )
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .padding(paddingValues)
                     .fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding())
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
-                androidx.compose.animation.AnimatedVisibility(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    visible = (lazyListState.firstVisibleItemIndex <= 0),
-                    enter = slideInVertically(
-                        initialOffsetY = { -it },
-                        animationSpec = tween(durationMillis = 300)
-                    ),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -it },
-                        animationSpec = tween(durationMillis = 300)
-                    )
-                ) {
+                item {
                     Row(
                         modifier = Modifier
                             .padding(vertical = 5.dp)
@@ -187,102 +149,110 @@ fun SharedTransitionScope.HomeScreen(
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .height(LocalConfiguration.current.screenHeightDp.dp)
-                ) {
-                    LazyVerticalStaggeredGrid(
-                        state = lazyListState,
-                        columns = StaggeredGridCells.Adaptive(150.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp),
+                items(data.itemCount / 2) { rowIndex ->
+                    Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalItemSpacing = 12.dp,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
+                        (0..1).forEach { columnIndex ->
+                            val index = rowIndex * 2 + columnIndex
+                            if (index < data.itemCount) {
+                                val item = data[index]
 
-                        items(
-                            count = data.itemCount,
-                            key = {
-                                it.toString()
-                            }
-                        ) { index ->
-                            val animatable = remember {
-                                Animatable(0.85f)
-                            }
+                                val scale = remember { Animatable(0.85f) }
+                                val alpha = remember { Animatable(0.5f) }
 
-                            LaunchedEffect(key1 = true) {
-                                animatable.animateTo(
-                                    1f,
-                                    tween(350, delayMillis = 100, easing = LinearEasing)
-                                )
-
-                            }
-
-                            val encodedUrl =
-                                URLEncoder.encode(data[index]?.urls?.regular, "UTF-8")
-                            val encodedLowQuality =
-                                URLEncoder.encode(data[index]?.urls?.small, "UTF-8")
-
-                            AsyncImage(
-                                model = ImageRequest.Builder(context)
-                                    .data(data[index]?.urls?.full.toString())
-                                    .crossfade(true)
-                                    .build(),
-                                placeholder = painterResource(id = R.drawable.img_placeholder),
-                                contentScale = ContentScale.FillBounds,
-                                contentDescription = data[index]?.altDescription,
-                                modifier = Modifier
-                                    .sharedElement(
-                                        state = rememberSharedContentState(
-                                            key = "image-${data[index]?.urls?.regular}"
-                                        ),
-                                        animatedVisibilityScope = animatedVisibilityScope
-                                    )
-                                    .graphicsLayer {
-                                        this.scaleX = animatable.value
-                                        this.scaleY = animatable.value
-                                    }
-                                    .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
-                                    .clip(MaterialTheme.shapes.large)
-                                    .clickable {
-                                        onImageClicked(
-                                            Triple(
-                                                encodedUrl,
-                                                data[index]?.id.toString(),
-                                                encodedLowQuality
+                                LaunchedEffect(key1 = true) {
+                                    launch {
+                                        scale.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 500,
+                                                easing = LinearEasing
                                             )
                                         )
                                     }
+                                    launch {
+                                        alpha.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 500,
+                                                easing = LinearEasing
+                                            )
+                                        )
+                                    }
+                                }
 
+                                val encodedUrl =
+                                    URLEncoder.encode(item?.urls?.regular, "UTF-8")
+                                val encodedLowQuality =
+                                    URLEncoder.encode(item?.urls?.small, "UTF-8")
+
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(item?.urls?.full.toString())
+                                        .crossfade(true)
+                                        .build(),
+                                    placeholder = painterResource(id = R.drawable.img_placeholder),
+                                    contentScale = ContentScale.FillBounds,
+                                    contentDescription = item?.altDescription,
+                                    modifier = Modifier
+                                        .sharedElement(
+                                            state = rememberSharedContentState(
+                                                key = "image-${item?.urls?.regular}"
+                                            ),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                        .graphicsLayer {
+                                            this.scaleX = scale.value
+                                            this.scaleY = scale.value
+                                            this.alpha = alpha.value
+                                        }
+                                        .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
+                                        .clip(MaterialTheme.shapes.large)
+                                        .clickable {
+                                            onImageClicked(
+                                                Triple(
+                                                    encodedUrl,
+                                                    item?.id.toString(),
+                                                    encodedLowQuality
+                                                )
+                                            )
+                                        }
+                                        .weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            data.apply {
+                when {
+                    loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
+                        Box(Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(paddingValues)
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 50.dp)
+                                    .navigationBarsPadding(),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                strokeCap = StrokeCap.Round
                             )
                         }
                     }
-                    data.apply {
-                        when {
-                            loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .padding(bottom = 90.dp)
-                                        .align(Alignment.BottomCenter)
-                                        .navigationBarsPadding(),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    strokeCap = StrokeCap.Round
-                                )
-                            }
 
-                            loadState.refresh is LoadState.Error || loadState.append is LoadState.Error -> {
-
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .navigationBarsPadding(),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    strokeCap = StrokeCap.Round
-                                )
-                            }
-
+                    loadState.refresh is LoadState.Error || loadState.append is LoadState.Error -> {
+                        Box(Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .padding(paddingValues)
+                                    .padding(bottom = 50.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .navigationBarsPadding(),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                strokeCap = StrokeCap.Round
+                            )
                         }
                     }
                 }

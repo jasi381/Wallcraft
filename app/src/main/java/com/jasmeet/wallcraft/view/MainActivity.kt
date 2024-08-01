@@ -2,6 +2,7 @@ package com.jasmeet.wallcraft.view
 
 import android.app.WallpaperManager
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -19,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
 import com.jasmeet.wallcraft.model.WallpaperType
+import com.jasmeet.wallcraft.utils.DataStoreUtil
 import com.jasmeet.wallcraft.view.navigation.WallCraftNavigator
 import com.jasmeet.wallcraft.view.theme.WallcraftTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,17 +48,49 @@ import java.net.URL
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private lateinit var dataStoreUtil: DataStoreUtil
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        dataStoreUtil = DataStoreUtil(applicationContext)
+
+        val systemTheme =
+            when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_YES -> {
+                    true
+                }
+
+                Configuration.UI_MODE_NIGHT_NO -> {
+                    false
+                }
+
+                else -> {
+                    false
+                }
+            }
+
+
+
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
-            navigationBarStyle = SystemBarStyle.light(
+            navigationBarStyle = SystemBarStyle.auto(
                 android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
+                android.graphics.Color.TRANSPARENT,
             )
         )
         setContent {
-            WallcraftTheme {
-                WallCraftNavigator(navController = rememberNavController())
+            val theme = dataStoreUtil.getTheme(systemTheme).collectAsState(initial = systemTheme)
+
+
+            WallcraftTheme(theme.value) {
+                WallCraftNavigator(
+                    navController = rememberNavController(),
+                    dataStoreUtil = dataStoreUtil,
+                    theme = theme.value
+                )
 
             }
         }
@@ -218,6 +253,7 @@ suspend fun setWallpaper2(bitmap: Bitmap?, context: Context, wallpaperType: Wall
                     wallpaperManager.setBitmap(bitmap)
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
                 }
+
                 else -> {}
             }
         } catch (e: IOException) {

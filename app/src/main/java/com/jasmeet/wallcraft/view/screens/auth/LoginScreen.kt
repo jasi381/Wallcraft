@@ -1,8 +1,5 @@
-
-
 package com.jasmeet.wallcraft.view.screens.auth
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -42,15 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
@@ -87,7 +79,10 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val credentialManager = CredentialManager.create(context)
+    val googleIdOptions = GetGoogleIdOption.Builder()
+        .setFilterByAuthorizedAccounts(false)
+        .setServerClientId(context.getString(R.string.default_web_client_id))
+        .build()
 
 
     LaunchedEffect(errorMessage) {
@@ -231,51 +226,18 @@ fun LoginScreen(
 
             ElevatedCard(
                 onClick = {
-                    googleLoading = true
-                    val googleIdOptions = GetGoogleIdOption.Builder()
-                        .setFilterByAuthorizedAccounts(false)
-                        .setServerClientId(context.getString(R.string.default_web_client_id))
-                        .build()
+                    loginSignUpViewModel.signInWithGoogle(
+                        googleIdOptions = googleIdOptions,
+                        context = context,
+                        onSuccess = {
+                            val navOptions = NavOptions.Builder()
+                                .setPopUpTo(AuthScreen.Login.route, inclusive = true)
+                                .build()
 
-                    val request = GetCredentialRequest.Builder()
-                        .addCredentialOption(googleIdOptions)
-                        .build()
+                            navController.navigate(Graph.HOME, navOptions)
 
-                    scope.launch {
-                        try {
-                            val result = credentialManager.getCredential(
-                                context = context,
-                                request = request
-                            )
-                            val credential = result.credential
-                            val googleIdTokenCredential =
-                                GoogleIdTokenCredential.createFrom(credential.data)
-
-                            val googleIdToken = googleIdTokenCredential.idToken
-
-                            val firebaseCredential =
-                                GoogleAuthProvider.getCredential(googleIdToken, null)
-
-                            val auth = FirebaseAuth.getInstance()
-
-                            auth.signInWithCredential(firebaseCredential)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-
-                                        googleLoading = false
-                                        auth.currentUser?.let { loginSignUpViewModel.saveData(it) }
-                                        val navOptions = NavOptions.Builder()
-                                            .setPopUpTo(AuthScreen.Login.route, inclusive = true)
-                                            .build()
-
-                                        navController.navigate(Graph.HOME, navOptions)
-                                    }
-                                }
-
-                        } catch (e: Exception) {
-                            Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
                         }
-                    }
+                    )
                 },
                 elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                 shape = CircleShape,

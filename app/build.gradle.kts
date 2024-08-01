@@ -147,7 +147,9 @@ dependencies {
     //ads
     implementation(libs.play.services.ads)
 
-    //Credential manager
+    //datastore
+    implementation(libs.androidx.datastore)
+
     // Credential Manager
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

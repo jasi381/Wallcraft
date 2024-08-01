@@ -53,6 +53,7 @@ import com.jasmeet.wallcraft.R
 import com.jasmeet.wallcraft.view.appComponents.IconTonalButtonComponent
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.CategoryDetailsViewModel
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -157,17 +158,30 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                                 }
                             ) { index ->
 
-                                val animatable = remember {
-                                    Animatable(0.85f)
-                                }
+                                val scale = remember { Animatable(0.85f) }
+                                val alpha = remember { Animatable(0.5f) }
 
                                 LaunchedEffect(key1 = true) {
-                                    animatable.animateTo(
-                                        1f,
-                                        tween(350, delayMillis = 100, easing = LinearEasing)
-                                    )
-
+                                    launch {
+                                        scale.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 500,
+                                                easing = LinearEasing
+                                            )
+                                        )
+                                    }
+                                    launch {
+                                        alpha.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 500,
+                                                easing = LinearEasing
+                                            )
+                                        )
+                                    }
                                 }
+
 
                                 val data = response.value?.results?.get(index)
                                 val encodedUrl = URLEncoder.encode(data?.urls?.regular, "UTF-8")
@@ -199,8 +213,9 @@ fun SharedTransitionScope.CategoryDetailsScreen(
                                             )
                                         }
                                         .graphicsLayer {
-                                            this.scaleX = animatable.value
-                                            this.scaleY = animatable.value
+                                            this.scaleX = scale.value
+                                            this.scaleY = scale.value
+                                            this.alpha = alpha.value
                                         }
                                 )
                             }

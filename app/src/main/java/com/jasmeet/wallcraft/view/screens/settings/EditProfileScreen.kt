@@ -3,6 +3,7 @@ package com.jasmeet.wallcraft.view.screens.settings
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -37,9 +38,6 @@ fun SharedTransitionScope.EditProfileScreen(
                         modifier = Modifier.sharedElement(
                             state = rememberSharedContentState(key = "editProfile"),
                             animatedVisibilityScope = animatedVisibilityScope,
-//                            boundsTransform = { _, _ ->
-//                                tween(500)
-//                            }
                         )
                     )
 
@@ -60,6 +58,9 @@ fun SharedTransitionScope.EditProfileScreen(
             )
         }
     ) {
+        Column {
+
+        }
 
     }
 }

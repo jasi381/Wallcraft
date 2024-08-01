@@ -40,7 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.jasmeet.wallcraft.R
+import com.jasmeet.wallcraft.utils.DataStoreUtil
 import com.jasmeet.wallcraft.view.appComponents.AnimatedTextSwitch
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
 import com.jasmeet.wallcraft.view.appComponents.BottomSheetComponent
@@ -78,14 +78,15 @@ fun SharedTransitionScope.SettingsScreen(
     onDownload: () -> Unit,
     onPrivacyPolicy: () -> Unit,
     animatedVisibilityScope: AnimatedContentScope,
+    dataStoreUtil: DataStoreUtil,
+    theme: Boolean,
 ) {
     val userInfo by loginSignUpViewModel.userInfo.collectAsState()
 
     val showAboutMeSheet = rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
-    var theme by remember { mutableStateOf(false) }
-    var showAds by remember { mutableStateOf(true) }
+    var themeSwitchState by rememberSaveable { mutableStateOf(theme) }
     val coroutine = rememberCoroutineScope()
 
     val context = LocalContext.current
@@ -97,6 +98,9 @@ fun SharedTransitionScope.SettingsScreen(
             .data(data = userInfo?.imgUrl)
             .build()
     )
+
+
+
 
     LaunchedEffect(true) {
         loginSignUpViewModel.getUserInfo()
@@ -232,34 +236,29 @@ fun SharedTransitionScope.SettingsScreen(
                             iconId = R.drawable.ic_theme,
                             text = "Theme",
                             onClick = {
-                                theme = !theme
+                                coroutine.launch {
+                                    themeSwitchState = !themeSwitchState
+                                    dataStoreUtil.saveTheme(themeSwitchState)
+
+                                }
                             },
                             endComponent = {
                                 AnimatedTextSwitch(
-                                    isChecked = theme,
-                                    onCheckedChange = { theme = !theme },
+                                    isChecked = themeSwitchState,
+                                    onCheckedChange = {
+                                        coroutine.launch {
+                                            themeSwitchState = !themeSwitchState
+                                            dataStoreUtil.saveTheme(themeSwitchState)
+
+                                        }
+                                    },
                                     enabledText = "Dark Mode",
                                     disabledText = "Light Mode"
                                 )
 
                             }
                         )
-                        MenuItem(
-                            iconId = R.drawable.ic_ads,
-                            text = "Ads",
-                            onClick = {
-                                showAds = !showAds
-                            },
-                            endComponent = {
-                                AnimatedTextSwitch(
-                                    isChecked = showAds,
-                                    onCheckedChange = { showAds = !showAds },
-                                    enabledText = "Show Ads",
-                                    disabledText = "Hide Ads"
-                                )
 
-                            }
-                        )
                     }
 
 

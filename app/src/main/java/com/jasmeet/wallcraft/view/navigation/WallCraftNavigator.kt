@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.jasmeet.wallcraft.utils.DataStoreUtil
 
 import com.jasmeet.wallcraft.view.navigation.graphs.AuthScreen
 import com.jasmeet.wallcraft.view.navigation.graphs.HomeScreenGraph
@@ -26,6 +27,8 @@ const val low_quality = "low_quality"
 @Composable
 fun WallCraftNavigator(
     navController: NavHostController,
+    dataStoreUtil: DataStoreUtil,
+    theme: Boolean,
 ) {
     NavHost(
         navController = navController,
@@ -54,7 +57,9 @@ fun WallCraftNavigator(
                         .setPopUpTo(Graph.HOME, inclusive = true)
                         .build()
                     navController.navigate(AuthScreen.Login.route, navOptions)
-                }
+                },
+                dataStoreUtil = dataStoreUtil,
+                theme = theme
             )
         }
     }

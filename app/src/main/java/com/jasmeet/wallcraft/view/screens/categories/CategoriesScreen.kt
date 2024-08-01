@@ -1,9 +1,6 @@
 package com.jasmeet.wallcraft.view.screens.categories
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -17,10 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -53,27 +48,21 @@ import com.jasmeet.wallcraft.utils.Utils
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.CategoriesViewModel
-import com.jasmeet.wallcraft.viewModel.LoginSignUpViewModel
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SharedTransitionScope.CategoriesScreen(
+fun CategoriesScreen(
     categoriesViewModel: CategoriesViewModel = hiltViewModel(),
-    loginSignUpViewModel: LoginSignUpViewModel = hiltViewModel(),
     paddingValues: PaddingValues,
-    animatedVisibilityScope: AnimatedContentScope,
     onImageClicked: (String) -> Unit
 ) {
 
     val categories = categoriesViewModel.categories.collectAsState()
-    val userInfo = loginSignUpViewModel.userInfo.collectAsState()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        loginSignUpViewModel.getUserInfo()
-    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
@@ -88,19 +77,6 @@ fun SharedTransitionScope.CategoriesScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         fontFamily = poppins,
                         fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                navigationIcon = {
-                    AsyncImage(
-                        model = userInfo.value?.imgUrl,
-                        contentDescription = "userInfo",
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(38.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop,
-                        placeholder = painterResource(id = R.drawable.img_placeholder)
-
                     )
                 },
                 scrollBehavior = scrollBehaviour
@@ -128,17 +104,24 @@ fun SharedTransitionScope.CategoriesScreen(
                 }
             ) { index ->
 
-                val animatable = remember {
-                    Animatable(0.85f)
-                }
+                val scale = remember { Animatable(0.85f) }
+                val alpha = remember { Animatable(0.5f) }
 
                 LaunchedEffect(key1 = true) {
-                    animatable.animateTo(
-                        1f,
-                        tween(350, delayMillis = 100, easing = LinearEasing)
-                    )
-
+                    launch {
+                        scale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+                        )
+                    }
+                    launch {
+                        alpha.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+                        )
+                    }
                 }
+
 
                 Box(
                     modifier = Modifier
@@ -146,8 +129,9 @@ fun SharedTransitionScope.CategoriesScreen(
                         .fillMaxWidth()
                         .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                         .graphicsLayer {
-                            this.scaleX = animatable.value
-                            this.scaleY = animatable.value
+                            this.scaleX = scale.value
+                            this.scaleY = scale.value
+                            this.alpha = alpha.value
                         }
                 ) {
                     val data = categories.value[index]
