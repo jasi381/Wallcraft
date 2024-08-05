@@ -76,10 +76,10 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
-            navigationBarStyle = SystemBarStyle.auto(
+            navigationBarStyle = SystemBarStyle.light(
                 android.graphics.Color.TRANSPARENT,
                 android.graphics.Color.TRANSPARENT,
-            )
+            ),
         )
         setContent {
             val theme = dataStoreUtil.getTheme(systemTheme).collectAsState(initial = systemTheme)

@@ -5,8 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,16 +28,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -58,7 +54,6 @@ import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.view.appComponents.OrderByButton
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.HomeViewModel
-import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -159,29 +154,6 @@ fun SharedTransitionScope.HomeScreen(
                             if (index < data.itemCount) {
                                 val item = data[index]
 
-                                val scale = remember { Animatable(0.85f) }
-                                val alpha = remember { Animatable(0.5f) }
-
-                                LaunchedEffect(key1 = true) {
-                                    launch {
-                                        scale.animateTo(
-                                            targetValue = 1f,
-                                            animationSpec = tween(
-                                                durationMillis = 500,
-                                                easing = LinearEasing
-                                            )
-                                        )
-                                    }
-                                    launch {
-                                        alpha.animateTo(
-                                            targetValue = 1f,
-                                            animationSpec = tween(
-                                                durationMillis = 500,
-                                                easing = LinearEasing
-                                            )
-                                        )
-                                    }
-                                }
 
                                 val encodedUrl =
                                     URLEncoder.encode(item?.urls?.regular, "UTF-8")
@@ -201,13 +173,21 @@ fun SharedTransitionScope.HomeScreen(
                                             state = rememberSharedContentState(
                                                 key = "image-${item?.urls?.regular}"
                                             ),
-                                            animatedVisibilityScope = animatedVisibilityScope
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                            boundsTransform = { initialRect, targetRect ->
+                                                tween(
+                                                    durationMillis = 800,
+                                                    easing = CubicBezierEasing(
+                                                        0.5f,
+                                                        0.75f,
+                                                        0.1f,
+                                                        0.85f
+                                                    )
+                                                )
+
+                                            }
                                         )
-                                        .graphicsLayer {
-                                            this.scaleX = scale.value
-                                            this.scaleY = scale.value
-                                            this.alpha = alpha.value
-                                        }
+
                                         .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                                         .clip(MaterialTheme.shapes.large)
                                         .clickable {

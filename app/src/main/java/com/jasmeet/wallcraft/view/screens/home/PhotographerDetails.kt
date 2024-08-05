@@ -7,6 +7,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -161,6 +163,18 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                         .sharedElement(
                             rememberSharedContentState(key = "image-$url"),
                             animatedVisibilityScope,
+                            boundsTransform = { initialRect, targetRect ->
+                                tween(
+                                    durationMillis = 800,
+                                    easing = CubicBezierEasing(
+                                        0.5f,
+                                        0.75f,
+                                        0.1f,
+                                        0.85f
+                                    )
+                                )
+
+                            }
                         )
                         .size(110.dp),
                     borderWidth = 5.dp
@@ -247,6 +261,18 @@ fun SharedTransitionScope.PhotographerDetailsScreen(
                                 .sharedElement(
                                     state = rememberSharedContentState(key = "image-${response?.urls?.regular}"),
                                     animatedVisibilityScope = animatedVisibilityScope,
+                                    boundsTransform = { initialRect, targetRect ->
+                                        tween(
+                                            durationMillis = 800,
+                                            easing = CubicBezierEasing(
+                                                0.5f,
+                                                0.75f,
+                                                0.1f,
+                                                0.85f
+                                            )
+                                        )
+
+                                    }
                                 )
                                 .clip(MaterialTheme.shapes.large)
                                 .height(LocalConfiguration.current.screenHeightDp.dp * 0.25f)

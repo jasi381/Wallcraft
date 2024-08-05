@@ -9,6 +9,8 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -183,6 +185,13 @@ fun SharedTransitionScope.DetailsScreen(
                             .sharedElement(
                                 rememberSharedContentState(key = "image-$data"),
                                 animatedVisibilityScope,
+                                boundsTransform = { initialRect, targetRect ->
+                                    tween(
+                                        durationMillis = 800,
+                                        easing = CubicBezierEasing(0.5f, 0.75f, 0.1f, 0.85f)
+                                    )
+
+                                }
                             )
 
                             .fillMaxWidth(),
@@ -206,6 +215,18 @@ fun SharedTransitionScope.DetailsScreen(
                                         key = "image-${it}"
                                     ),
                                     animatedVisibilityScope = animatedVisibilityScope,
+                                    boundsTransform = { initialRect, targetRect ->
+                                        tween(
+                                            durationMillis = 800,
+                                            easing = CubicBezierEasing(
+                                                0.5f,
+                                                0.75f,
+                                                0.1f,
+                                                0.85f
+                                            )
+                                        )
+
+                                    }
                                 )
                                 .clip(CircleShape)
                                 .clickable {
