@@ -260,7 +260,7 @@ fun SharedTransitionScope.EditProfileScreen(
 }
 
 @Composable
-fun TransparentSuccessDialog() {
+fun TransparentSuccessDialog(onDismiss: () -> Unit) {
 
     Box(
         modifier = Modifier
