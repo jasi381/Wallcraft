@@ -10,22 +10,21 @@ plugins {
 
 android {
 
-
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\Users\\Jasi\\StudioProjects\\Wallcraft\\keyStore.jks")
+            storeFile = file("C:\\Users\\User\\StudioProjects\\Wallcraft\\keyStore.jks")
             storePassword = "jasmeet34"
             keyAlias = "release"
             keyPassword = "jasmeet34"
         }
     }
     namespace = "com.jasmeet.wallcraft"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.jasmeet.wallcraft"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -43,8 +42,7 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
-            //TODO:Change this after uploading to playstore
-            isDebuggable = true
+            isDebuggable = false
         }
     }
     compileOptions {
@@ -79,6 +77,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.runtime.livedata)
+
 
     //testing dependencies
     testImplementation(libs.mockito.core)
@@ -137,6 +136,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
+    implementation(libs.firebase.storage.ktx)
 
     //qr code generator
     implementation(libs.qrose)

@@ -1,17 +1,26 @@
 package com.jasmeet.wallcraft.model.repoImpl
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.jasmeet.wallcraft.model.Collections
 import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.userInfo.UserInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class FirebaseRepoImpl(
     private val auth: FirebaseAuth,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage,
+    private val contentResolver: ContentResolver,
+
 ) : FirebaseRepo {
     override suspend fun loginWithEmailAndPassword(email: String, password: String): AuthResult {
         return auth.signInWithEmailAndPassword(email, password).await()
@@ -25,7 +34,7 @@ class FirebaseRepoImpl(
     }
 
     override suspend fun saveUserInfo(currentUser: FirebaseUser) {
-        val user = currentUser ?: return
+        val user = currentUser
         db.collection(Collections.USER_COLLECTION).document(user.uid).set(
             UserInfo(
                 name = user.displayName ?: user.email.toString().substringBefore("@"),
@@ -47,6 +56,45 @@ class FirebaseRepoImpl(
             ?: throw IllegalStateException("User not found")
 
     }
+
+
+    override suspend fun updateUserImageAndName(imageUri: Uri?, newName: String?) {
+        val user = auth.currentUser ?: throw IllegalStateException("User not logged in")
+        val updates = mutableMapOf<String, Any>()
+
+        if (newName != null) {
+            updates["name"] = newName
+        }
+
+        if (imageUri != null) {
+            val imageUrl = uploadImageToFirebaseStorage(imageUri)
+            updates["imgUrl"] = imageUrl
+        }
+
+        if (updates.isNotEmpty()) {
+            db.collection(Collections.USER_COLLECTION).document(user.uid)
+                .update(updates)
+                .await()
+        }
+    }
+
+    private suspend fun uploadImageToFirebaseStorage(imageUri: Uri): String {
+        val user = auth.currentUser ?: throw IllegalStateException("User not logged in")
+        val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
+
+        return withContext(Dispatchers.IO) {
+            val stream = contentResolver.openInputStream(imageUri)
+                ?: throw IOException("Failed to open input stream for image URI")
+
+            stream.use { inputStream ->
+                storageRef.putStream(inputStream).await()
+                storageRef.downloadUrl.await().toString()
+            }
+        }
+    }
+
+
+
 
     override fun signOut() {
         auth.signOut()

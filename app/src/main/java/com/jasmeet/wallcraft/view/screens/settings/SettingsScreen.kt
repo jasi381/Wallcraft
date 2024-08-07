@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,16 +20,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
@@ -39,8 +40,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.credentials.CredentialManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
@@ -59,6 +63,7 @@ import com.jasmeet.wallcraft.utils.DataStoreUtil
 import com.jasmeet.wallcraft.view.appComponents.AnimatedTextSwitch
 import com.jasmeet.wallcraft.view.appComponents.AnnotatedStringComponent
 import com.jasmeet.wallcraft.view.appComponents.BottomSheetComponent
+import com.jasmeet.wallcraft.view.appComponents.LoadingButton
 import com.jasmeet.wallcraft.view.appComponents.MenuItem
 import com.jasmeet.wallcraft.view.appComponents.TextComponent
 import com.jasmeet.wallcraft.view.appComponents.ThreeDBlinkingBorderImage
@@ -82,6 +87,7 @@ fun SharedTransitionScope.SettingsScreen(
     theme: Boolean,
 ) {
     val userInfo by loginSignUpViewModel.userInfo.collectAsState()
+    val showLogoutDialog = rememberSaveable { mutableStateOf(false) }
 
     val showAboutMeSheet = rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -99,6 +105,8 @@ fun SharedTransitionScope.SettingsScreen(
             .build()
     )
 
+    val currentTheme by rememberUpdatedState(theme)
+
 
 
 
@@ -108,37 +116,24 @@ fun SharedTransitionScope.SettingsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Wallcraft",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontFamily = poppins,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+            key(currentTheme) {
+                CenterAlignedTopAppBar(
 
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
-                actions = {
-                    IconButton(
-                        onClick = {
-                            loginSignUpViewModel.signOut(
-                                onSignOut = {
-                                    onSignOut()
-                                },
-                                credentialManager = credentialManager
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.Logout,
-                            contentDescription = "Logout"
+                    title = {
+                        Text(
+                            text = "Wallcraft",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontFamily = poppins,
+                            fontWeight = FontWeight.SemiBold,
                         )
-                    }
-                }
-            )
+
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ),
+
+                    )
+            }
         }
     ) {
         LazyColumn(
@@ -157,21 +152,22 @@ fun SharedTransitionScope.SettingsScreen(
                 )
             }
             item { Spacer(modifier = Modifier.height(12.dp)) }
-            item {
+            item(key = currentTheme) {
                 TextComponent(
                     text = userInfo?.name.toString(),
                     fontWeight = FontWeight.Bold,
                     fontFamily = poppins,
-                    textSize = 20.sp
+                    textSize = 20.sp,
+                    textColor = MaterialTheme.colorScheme.onBackground
                 )
-            }
-            item {
                 TextComponent(
                     text = userInfo?.email.toString(),
                     fontFamily = poppins,
-                    textSize = 15.sp
+                    textSize = 15.sp,
+                    textColor = MaterialTheme.colorScheme.onBackground
                 )
             }
+
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item {
                 Surface(
@@ -222,7 +218,7 @@ fun SharedTransitionScope.SettingsScreen(
                     }
                 }
             }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(10.dp)) }
             item {
                 Surface(
                     Modifier
@@ -264,7 +260,7 @@ fun SharedTransitionScope.SettingsScreen(
 
                 }
             }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(10.dp)) }
             item {
                 Surface(
                     Modifier
@@ -329,7 +325,21 @@ fun SharedTransitionScope.SettingsScreen(
                     }
                 }
             }
-            item { Spacer(modifier = Modifier.height(8.dp)) }
+            item { Spacer(modifier = Modifier.height(10.dp)) }
+
+            item {
+                LoadingButton(
+                    onClick = {
+                        showLogoutDialog.value = true
+                    },
+                    loading = false,
+                    text = "Logout",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                    shape = MaterialTheme.shapes.small
+                )
+            }
 
         }
         if (showAboutMeSheet.value) {
@@ -339,6 +349,23 @@ fun SharedTransitionScope.SettingsScreen(
                 coroutine = coroutine
             )
         }
+    }
+    if (showLogoutDialog.value) {
+        CustomConfirmationDialog(
+            onConfirm = {
+                showLogoutDialog.value = false
+                loginSignUpViewModel.signOut(
+                    onSignOut = {
+                        onSignOut()
+                    },
+                    credentialManager = credentialManager
+                )
+            },
+            onDismiss = {
+                showLogoutDialog.value = false
+            },
+            title = "Are u sure you want to logout?",
+        )
     }
 
 }
@@ -437,4 +464,55 @@ fun AboutMeSheet(
         }
     }
 
+}
+
+
+@Composable
+fun CustomConfirmationDialog(
+    title: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = poppins,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onConfirm,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text("Yes", color = MaterialTheme.colorScheme.background)
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,10 +1,12 @@
 package com.jasmeet.wallcraft.di
 
 import android.app.Application
+import android.content.ContentResolver
 import android.content.Context
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.jasmeet.wallcraft.model.apiService.ApiService
 import com.jasmeet.wallcraft.model.dao.DownloadsDao
 import com.jasmeet.wallcraft.model.dao.FavouriteDao
@@ -66,9 +68,29 @@ object AppModule {
     }
 
     @Provides
-    fun providesUserRepository(auth: FirebaseAuth, db: FirebaseFirestore): FirebaseRepo {
-        return FirebaseRepoImpl(auth, db)
+    @Singleton
+    fun providesFirebaseStorage(): FirebaseStorage {
+        return FirebaseStorage.getInstance()
     }
+
+    @Provides
+    @Singleton
+    fun providesContentResolver(context: Context): ContentResolver {
+        return context.contentResolver
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserRepository(
+        auth: FirebaseAuth,
+        db: FirebaseFirestore,
+        storage: FirebaseStorage,
+        contentResolver: ContentResolver
+    ): FirebaseRepo {
+        return FirebaseRepoImpl(auth, db, storage, contentResolver)
+    }
+
+
 
     @Provides
     @Singleton

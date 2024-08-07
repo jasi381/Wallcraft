@@ -1,6 +1,7 @@
 package com.jasmeet.wallcraft.viewModel
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
@@ -28,6 +29,9 @@ class LoginSignUpViewModel @Inject constructor(
 
     private val _userInfo = MutableStateFlow<UserInfo?>(null)
     val userInfo: StateFlow<UserInfo?> = _userInfo
+
+    private val _updateSuccess = MutableStateFlow<Long?>(null)
+    val updateSuccess: StateFlow<Long?> = _updateSuccess
 
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> = _errorState
@@ -133,6 +137,20 @@ class LoginSignUpViewModel @Inject constructor(
                 repository.loginWithEmailAndPassword(email, password)
                 _isLoading.value = false
                 onLogin()
+            } catch (e: Exception) {
+                setErrorMessage(e.message)
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun updateUserInfo(imageUri: Uri?, newName: String?) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                repository.updateUserImageAndName(imageUri, newName)
+                _isLoading.value = false
+                _updateSuccess.value = System.currentTimeMillis()
             } catch (e: Exception) {
                 setErrorMessage(e.message)
                 _isLoading.value = false

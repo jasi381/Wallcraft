@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -60,6 +62,7 @@ fun CategoriesScreen(
 ) {
 
     val categories = categoriesViewModel.categories.collectAsState()
+    val isLoading = categoriesViewModel.isLoading.collectAsState()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val context = LocalContext.current
 
@@ -175,7 +178,17 @@ fun CategoriesScreen(
             }
 
         }
+
+        if (isLoading.value) {
+            Box(Modifier.fillMaxSize()) {
+                if (isLoading.value) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+            }
+        }
     }
-
-
 }

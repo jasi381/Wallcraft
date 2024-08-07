@@ -12,7 +12,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
-fun LottieComponent(rawRes: Int, modifier: Modifier) {
+fun LottieComponent(rawRes: Int, modifier: Modifier, speed: Float = 1.2f) {
 
     val composition by rememberLottieComposition(
         LottieCompositionSpec
@@ -23,7 +23,7 @@ fun LottieComponent(rawRes: Int, modifier: Modifier) {
         composition,
         iterations = LottieConstants.IterateForever,
         isPlaying = true,
-        speed = 1.2f,
+        speed = speed,
         restartOnPlay = false
 
     )
