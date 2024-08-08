@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
 
     private fun loadData(orderBy: String = OrderBy.LATEST.displayName) {
         viewModelScope.launch {
-            try{
+            try {
                 Pager(
                     config = PagingConfig(
                         pageSize = 70,
@@ -90,7 +90,7 @@ class HomeViewModel @Inject constructor(
                         _homeData.value = it
                         _error.value = null
                     }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 _error.value = e.message
             }
         }

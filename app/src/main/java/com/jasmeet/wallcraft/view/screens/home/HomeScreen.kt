@@ -20,9 +20,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -96,6 +100,16 @@ fun SharedTransitionScope.HomeScreen(
                         fontWeight = FontWeight.SemiBold,
                     )
                 },
+                actions = {
+                    IconButton(
+                        onClick = { homeViewModel.refreshData() }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                },
                 scrollBehavior = scrollBehaviour
             )
         }
@@ -105,7 +119,7 @@ fun SharedTransitionScope.HomeScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                NoInternetView(error = error.value!!)
+                NoInternetView(error = error.value ?: "Something went wrong!")
             }
         } else {
             LazyColumn(
@@ -174,7 +188,7 @@ fun SharedTransitionScope.HomeScreen(
                                                 key = "image-${item?.urls?.regular}"
                                             ),
                                             animatedVisibilityScope = animatedVisibilityScope,
-                                            boundsTransform = { initialRect, targetRect ->
+                                            boundsTransform = { _, _ ->
                                                 tween(
                                                     durationMillis = 800,
                                                     easing = CubicBezierEasing(
@@ -206,34 +220,34 @@ fun SharedTransitionScope.HomeScreen(
                     }
                 }
             }
-            data.apply {
-                when {
-                    loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
-                        Box(Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(paddingValues)
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = 50.dp)
-                                    .navigationBarsPadding(),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                strokeCap = StrokeCap.Round
-                            )
-                        }
+        }
+        data.apply {
+            when {
+                loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
+                    Box(Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 50.dp)
+                                .navigationBarsPadding(),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            strokeCap = StrokeCap.Round
+                        )
                     }
+                }
 
-                    loadState.refresh is LoadState.Error || loadState.append is LoadState.Error -> {
-                        Box(Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(paddingValues)
-                                    .padding(bottom = 50.dp)
-                                    .align(Alignment.BottomCenter)
-                                    .navigationBarsPadding(),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                strokeCap = StrokeCap.Round
-                            )
-                        }
+                loadState.refresh is LoadState.Error || loadState.append is LoadState.Error -> {
+                    Box(Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .padding(bottom = 50.dp)
+                                .align(Alignment.BottomCenter)
+                                .navigationBarsPadding(),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            strokeCap = StrokeCap.Round
+                        )
                     }
                 }
             }
