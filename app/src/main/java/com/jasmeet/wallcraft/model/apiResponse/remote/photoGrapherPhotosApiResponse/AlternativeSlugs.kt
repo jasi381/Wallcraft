@@ -1,9 +1,10 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.photoGrapherPhotosApiResponse
 
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
-
+@Keep
 data class AlternativeSlugs(
     @SerializedName("de")
     val de: String?,
@@ -14,7 +15,7 @@ data class AlternativeSlugs(
     @SerializedName("fr")
     val fr: String?,
     @SerializedName("it")
-    val `it`: String?,
+    val it: String?,
     @SerializedName("ja")
     val ja: String?,
     @SerializedName("ko")

@@ -34,16 +34,20 @@ class FirebaseRepoImpl(
     }
 
     override suspend fun saveUserInfo(currentUser: FirebaseUser) {
-        val user = currentUser
-        db.collection(Collections.USER_COLLECTION).document(user.uid).set(
+
+        currentUser.email?.let {
             UserInfo(
-                name = user.displayName ?: user.email.toString().substringBefore("@"),
-                email = user.email,
-                uid = user.uid,
-                imgUrl = if (user.photoUrl != null) user.photoUrl.toString() else "https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1031&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                name = currentUser.displayName ?: currentUser.email.toString().substringBefore("@"),
+                email = it,
+                uid = currentUser.uid,
+                imgUrl = if (currentUser.photoUrl != null) currentUser.photoUrl.toString() else "https://images.unsplash.com/photo-1511367461989-f85a21fda167?q=80&w=1031&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
             )
-        ).await()
+        }?.let {
+            db.collection(Collections.USER_COLLECTION).document(currentUser.uid).set(
+                it
+            ).await()
+        }
     }
     override suspend fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email).await()

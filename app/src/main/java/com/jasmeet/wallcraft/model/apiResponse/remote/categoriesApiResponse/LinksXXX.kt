@@ -1,5 +1,8 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.categoriesApiResponse
 
+import androidx.annotation.Keep
+
+@Keep
 data class LinksXXX(
     val self: String?,
     val html: String?,

@@ -1,8 +1,10 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.categoriesApiResponse
 
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class Travel(
     @SerializedName("approved_on")
     val approvedOn: String?,

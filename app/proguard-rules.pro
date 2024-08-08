@@ -1,21 +1,31 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Firebase
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepclassmembers class com.google.firebase.auth.FirebaseAuth {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.FirebaseFirestore {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.QuerySnapshot {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.DocumentSnapshot {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.WriteBatch {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.Transaction {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.DocumentReference {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.QueryDocumentSnapshot {
+    *;
+}
+-keepclassmembers class com.google.firebase.firestore.FieldValue {
+    *;
+}

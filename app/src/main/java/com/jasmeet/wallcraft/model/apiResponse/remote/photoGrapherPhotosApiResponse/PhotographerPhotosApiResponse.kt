@@ -1,8 +1,9 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.photoGrapherPhotosApiResponse
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
-
+@Keep
 data class PhotographerPhotosApiResponse(
     @SerializedName("alt_description")
     val altDescription: String?,

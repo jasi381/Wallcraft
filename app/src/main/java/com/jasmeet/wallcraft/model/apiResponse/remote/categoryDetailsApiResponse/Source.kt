@@ -1,8 +1,10 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.categoryDetailsApiResponse
 
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class Source(
     @SerializedName("ancestry")
     val ancestry: Ancestry?,

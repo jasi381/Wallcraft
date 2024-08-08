@@ -154,14 +154,14 @@ fun SharedTransitionScope.SettingsScreen(
             item { Spacer(modifier = Modifier.height(12.dp)) }
             item(key = currentTheme) {
                 TextComponent(
-                    text = userInfo?.name.toString(),
+                    text = userInfo?.name ?: "Loading",
                     fontWeight = FontWeight.Bold,
                     fontFamily = poppins,
                     textSize = 20.sp,
                     textColor = MaterialTheme.colorScheme.onBackground
                 )
                 TextComponent(
-                    text = userInfo?.email.toString(),
+                    text = userInfo?.email ?: "Loading",
                     fontFamily = poppins,
                     textSize = 15.sp,
                     textColor = MaterialTheme.colorScheme.onBackground

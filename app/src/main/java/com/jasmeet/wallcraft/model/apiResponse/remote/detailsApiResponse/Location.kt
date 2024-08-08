@@ -1,8 +1,9 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
-
+@Keep
 data class Location(
 
     @SerializedName("name") var name: String? = null,

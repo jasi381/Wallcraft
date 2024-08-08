@@ -1,8 +1,10 @@
 package com.jasmeet.wallcraft.model.apiResponse.local
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Keep
 @Entity(tableName = "favourites")
 data class FavouritesEntity(
     @PrimaryKey

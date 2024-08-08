@@ -46,7 +46,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,6 +83,7 @@ fun SharedTransitionScope.EditProfileScreen(
     val name = userInfo.value?.name ?: ""
     var editableName by remember(name) { mutableStateOf(name) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val clipboard = LocalClipboardManager.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -94,7 +97,9 @@ fun SharedTransitionScope.EditProfileScreen(
         error.value?.let {
             snackbarHostState.showSnackbar(
                 message = it,
-                duration = SnackbarDuration.Short
+                duration = SnackbarDuration.Short,
+                withDismissAction = true,
+                actionLabel = "Dismiss"
             )
         }
     }
@@ -111,7 +116,16 @@ fun SharedTransitionScope.EditProfileScreen(
 
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState, modifier = Modifier.clickable {
+                val errorMessage = error.value
+
+
+                clipboard.setText(AnnotatedString(errorMessage.toString()))
+
+
+            })
+        },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -253,14 +267,12 @@ fun SharedTransitionScope.EditProfileScreen(
         }
     }
     if (showSuccessDialog) {
-        TransparentSuccessDialog(
-            onDismiss = { showSuccessDialog = false }
-        )
+        TransparentSuccessDialog()
     }
 }
 
 @Composable
-fun TransparentSuccessDialog(onDismiss: () -> Unit) {
+fun TransparentSuccessDialog() {
 
     Box(
         modifier = Modifier

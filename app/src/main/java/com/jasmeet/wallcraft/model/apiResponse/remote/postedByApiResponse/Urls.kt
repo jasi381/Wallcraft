@@ -1,7 +1,9 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.postedByApiResponse
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class Urls(
     val full: String?,
     val raw: String?,

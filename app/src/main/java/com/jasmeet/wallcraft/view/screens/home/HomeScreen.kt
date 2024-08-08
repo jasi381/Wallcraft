@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -102,9 +102,9 @@ fun SharedTransitionScope.HomeScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { homeViewModel.refreshData() }) {
+                        onClick = { }) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
+                            imageVector = Icons.Default.AutoAwesome,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onBackground
                         )
@@ -158,7 +158,11 @@ fun SharedTransitionScope.HomeScreen(
                         )
                     }
                 }
-                items(data.itemCount / 2) { rowIndex ->
+                items(
+                    data.itemCount / 2,
+                    key = {
+                        it.toString()
+                    }) { rowIndex ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.fillMaxWidth()

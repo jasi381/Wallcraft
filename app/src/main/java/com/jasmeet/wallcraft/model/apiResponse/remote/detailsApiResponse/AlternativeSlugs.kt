@@ -1,10 +1,11 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 
 data class AlternativeSlugs(
-
+    @Keep
     @SerializedName("en") var en: String? = null,
     @SerializedName("es") var es: String? = null,
     @SerializedName("ja") var ja: String? = null,

@@ -1,8 +1,9 @@
 package com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
-
+@Keep
 data class Urls(
 
     @SerializedName("raw") var raw: String? = null,

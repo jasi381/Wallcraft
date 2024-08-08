@@ -9,4 +9,3 @@ fun AnimatedContentTransitionScope<NavBackStackEntry>.enterTransition() =
         AnimatedContentTransitionScope.SlideDirection.Start, tween(700)
     )
 
-
