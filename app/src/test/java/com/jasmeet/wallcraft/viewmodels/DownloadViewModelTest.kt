@@ -16,7 +16,7 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -55,7 +55,7 @@ class DownloadViewModelTest {
     }
 
     @Test
-    fun `startDownload should call downloadRepo and update loading state`() = runBlockingTest {
+    fun `startDownload should call downloadRepo and update loading state`() = runTest {
         // Given
         val url = "https://i.imgur.com/OB0y6MR.jpg"
         val expectedMessage = "Download Complete"
@@ -74,7 +74,7 @@ class DownloadViewModelTest {
     }
 
     @Test
-    fun `startDownload should update loading state on download failure`() = runBlockingTest {
+    fun `startDownload should update loading state on download failure`() = runTest {
         // Given
         val url = "https://i.imgur.com/OB0y6MR.jpg"
         coEvery { downloadRepo.downloadFile(url) } throws IOException()

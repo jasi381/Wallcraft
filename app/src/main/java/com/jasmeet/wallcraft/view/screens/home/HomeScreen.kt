@@ -1,17 +1,24 @@
 package com.jasmeet.wallcraft.view.screens.home
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,8 +27,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,13 +43,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +63,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -58,9 +75,15 @@ import com.jasmeet.wallcraft.view.appComponents.NoInternetView
 import com.jasmeet.wallcraft.view.appComponents.OrderByButton
 import com.jasmeet.wallcraft.view.theme.poppins
 import com.jasmeet.wallcraft.viewModel.HomeViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
-@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun SharedTransitionScope.HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
@@ -72,9 +95,18 @@ fun SharedTransitionScope.HomeScreen(
     val data = homeViewModel.homeData.collectAsLazyPagingItems()
     val error = homeViewModel.error.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val randomImgData = homeViewModel.randomImgData.collectAsState(null)
 
     val lazyListState = rememberLazyListState()
     val scrollBehaviour = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    var selectedImageUrl by remember { mutableStateOf<String?>(null) }
+    var isHolding by remember { mutableStateOf(false) }
+
+    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
+    var showInfoRandomImgData by rememberSaveable { mutableStateOf(false) }
 
     BackHandler {
         if (selectedIndex.intValue == 1) {
@@ -102,7 +134,10 @@ fun SharedTransitionScope.HomeScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { }) {
+                        onClick = {
+                            showInfoRandomImgData = true
+                            homeViewModel.getRandomImage()
+                        }) {
                         Icon(
                             imageVector = Icons.Default.AutoAwesome,
                             contentDescription = null,
@@ -130,7 +165,7 @@ fun SharedTransitionScope.HomeScreen(
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item {
+                stickyHeader {
                     Row(
                         modifier = Modifier
                             .padding(vertical = 5.dp)
@@ -158,6 +193,8 @@ fun SharedTransitionScope.HomeScreen(
                         )
                     }
                 }
+
+
                 items(
                     data.itemCount / 2,
                     key = {
@@ -205,18 +242,57 @@ fun SharedTransitionScope.HomeScreen(
 
                                             }
                                         )
-
                                         .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
                                         .clip(MaterialTheme.shapes.large)
-                                        .clickable {
-                                            onImageClicked(
-                                                Triple(
-                                                    encodedUrl,
-                                                    item?.id.toString(),
-                                                    encodedLowQuality
-                                                )
-                                            )
+                                        .pointerInput(Unit) {
+                                            awaitEachGesture {
+                                                val down = awaitFirstDown(requireUnconsumed = false)
+                                                val downTime = System.currentTimeMillis()
+
+                                                var holdJob: Job? = null
+                                                holdJob = scope.launch {
+                                                    delay(300) // Adjust this delay as needed
+                                                    isHolding = true
+                                                    selectedImageUrl = item?.urls?.regular
+                                                    showInfoDialog = true
+                                                    Log.d("Gesture", "Hold started")
+                                                }
+
+                                                val up = waitForUpOrCancellation()
+                                                holdJob.cancel()
+
+                                                when (up) {
+                                                    null -> {
+                                                        // The gesture was cancelled
+                                                        isHolding = false
+                                                        showInfoDialog = false
+                                                        Log.d("Gesture", "Gesture cancelled")
+                                                    }
+
+                                                    else -> {
+                                                        val upTime = System.currentTimeMillis()
+                                                        if (isHolding) {
+                                                            // Release after hold
+                                                            isHolding = false
+                                                            showInfoDialog = false
+                                                            Log.d("Gesture", "Hold released")
+
+                                                        } else if (upTime - downTime < 300) {
+                                                            // This was a quick tap
+                                                            Log.d("Gesture", "Item clicked")
+                                                            onImageClicked(
+                                                                Triple(
+                                                                    encodedUrl,
+                                                                    item?.id.toString(),
+                                                                    encodedLowQuality
+                                                                )
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
+
                                         .weight(1f)
                                 )
                             }
@@ -257,6 +333,103 @@ fun SharedTransitionScope.HomeScreen(
             }
         }
     }
+    if (showInfoDialog && selectedImageUrl != null) {
+        Dialog(onDismissRequest = { showInfoDialog = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f)
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                IconButton(
+                    onClick = { showInfoDialog = false },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close Dialog")
+                }
+
+                AsyncImage(
+                    model = selectedImageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
+                        .align(Alignment.Center),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+
+    if (showInfoRandomImgData && randomImgData.value != null) {
+        Dialog(onDismissRequest = { }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f)
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
+                ) {
+
+                    val encodedUrl =
+                        URLEncoder.encode(randomImgData.value?.urls?.regular, "UTF-8")
+                    val encodedLowQuality =
+                        URLEncoder.encode(randomImgData.value?.urls?.small, "UTF-8")
+
+                    AsyncImage(
+                        model = randomImgData.value?.urls?.regular,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = {
+                            onImageClicked(
+                                Triple(
+                                    encodedUrl,
+                                    randomImgData.value?.id.toString(),
+                                    encodedLowQuality
+                                )
+                            )
+                            showInfoRandomImgData = false
+                        }) {
+                            Icon(imageVector = Icons.Default.Info, contentDescription = "More Info")
+                        }
+
+                        IconButton(onClick = { showInfoRandomImgData = false }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close Dialog"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
 }
 
 

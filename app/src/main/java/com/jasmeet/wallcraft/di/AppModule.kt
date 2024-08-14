@@ -22,6 +22,7 @@ import com.jasmeet.wallcraft.model.repo.FirebaseRepo
 import com.jasmeet.wallcraft.model.repo.HomeRepo
 import com.jasmeet.wallcraft.model.repo.PhotographerPhotosRepo
 import com.jasmeet.wallcraft.model.repo.PostedByRepo
+import com.jasmeet.wallcraft.model.repo.RandomImageRepo
 import com.jasmeet.wallcraft.model.repo.WallpaperRepo
 import com.jasmeet.wallcraft.model.repoImpl.CategoriesRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.CategoryDetailsRepoImpl
@@ -33,6 +34,7 @@ import com.jasmeet.wallcraft.model.repoImpl.FirebaseRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.HomeRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.PhotographerPhotosRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.PostedByRepoImpl
+import com.jasmeet.wallcraft.model.repoImpl.RandomImageRepoImpl
 import com.jasmeet.wallcraft.model.repoImpl.WallpaperRepoImpl
 import dagger.Module
 import dagger.Provides
@@ -192,4 +194,10 @@ object AppModule {
     @Singleton
     fun providesCategoryDetailsRepo(apiService: ApiService): CategoryDetailsRepo =
         CategoryDetailsRepoImpl(apiService)
+
+
+    @Provides
+    @Singleton
+    fun providesRandomImageRepo(apiService: ApiService): RandomImageRepo =
+        RandomImageRepoImpl(apiService)
 }

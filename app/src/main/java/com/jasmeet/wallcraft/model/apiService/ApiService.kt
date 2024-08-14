@@ -8,6 +8,7 @@ import com.jasmeet.wallcraft.model.apiResponse.remote.detailsApiResponse.Details
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.photoGrapherPhotosApiResponse.PhotographerPhotosApiResponse
 import com.jasmeet.wallcraft.model.apiResponse.remote.postedByApiResponse.PostedByApiResponse
+import com.jasmeet.wallcraft.model.apiResponse.remote.randomImageApiResponse.RandomImageApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -62,6 +63,12 @@ interface ApiService {
         @Query("client_id") clientId: String = CLIENT_ID,
         @Query("query") query: String,
     ): CategoryDetailsApiResponse
+
+
+    @GET("photos/random")
+    suspend fun getRandomImage(
+        @Query("client_id") clientId: String = CLIENT_ID,
+    ): RandomImageApiResponse
 
 
 }

@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -13,8 +14,10 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.jasmeet.wallcraft.model.OrderBy
 import com.jasmeet.wallcraft.model.apiResponse.remote.homeApiResponse.HomeApiResponse
+import com.jasmeet.wallcraft.model.apiResponse.remote.randomImageApiResponse.RandomImageApiResponse
 import com.jasmeet.wallcraft.model.pagingSource.HomePagingSource
 import com.jasmeet.wallcraft.model.repo.HomeRepo
+import com.jasmeet.wallcraft.model.repo.RandomImageRepo
 import com.jasmeet.wallcraft.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val homeRepo: HomeRepo,
+    private val randomImgRepo: RandomImageRepo,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -37,6 +41,12 @@ class HomeViewModel @Inject constructor(
 
     private val _error: MutableStateFlow<String?> = MutableStateFlow(null)
     val error = _error.asStateFlow()
+
+    private val _randomImgData: MutableStateFlow<RandomImageApiResponse?> = MutableStateFlow(null)
+    val randomImgData = _randomImgData.asStateFlow()
+
+    private val _isLoading: MutableStateFlow<Boolean?> = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -94,6 +104,24 @@ class HomeViewModel @Inject constructor(
                 _error.value = e.message
             }
         }
+    }
+
+
+    fun getRandomImage() {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                _randomImgData.value = randomImgRepo.getRandomImage()
+                Log.d("Rand", "getRandomImage: ${_randomImgData.value}")
+            } catch (e: Exception) {
+                _error.value = e.message
+                Log.d("RandError", "getRandomImage: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+
     }
 
     override fun onCleared() {

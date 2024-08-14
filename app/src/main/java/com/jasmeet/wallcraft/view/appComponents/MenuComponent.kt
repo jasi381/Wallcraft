@@ -12,7 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jasmeet.wallcraft.view.theme.poppins
 
 @Composable
@@ -43,8 +45,10 @@ fun MenuItem(
             )
             TextComponent(
                 text = text,
+                textSize = 16.sp,
                 textColor = MaterialTheme.colorScheme.onBackground,
                 fontFamily = poppins,
+                fontWeight = FontWeight.SemiBold,
                 modifier = textModifier.padding(start = 8.dp)
             )
         }

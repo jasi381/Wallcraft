@@ -62,7 +62,7 @@ class LoginSignUpViewModelTest {
 
         // Then
         verify(repo).signUpWithEmailAndPassword(email, password)
-        verify(repo).saveUserInfo(authResult)
+        verify(repo).saveUserInfo(authResult.user!!)
         assertEquals(null, viewModel.errorState.value)
     }
 
@@ -171,10 +171,10 @@ class LoginSignUpViewModelTest {
         whenever(repo.saveUserInfo(any())).thenReturn(Unit)
 
         // When
-        viewModel.saveData(authResult)
+        viewModel.saveData(authResult.user!!)
 
         // Then
-        verify(repo).saveUserInfo(authResult)
+        verify(repo).saveUserInfo(authResult.user!!)
         assertEquals(false, viewModel.isLoading.value)
         assertNull(viewModel.errorState.value)
     }
@@ -187,10 +187,10 @@ class LoginSignUpViewModelTest {
         whenever(repo.saveUserInfo(any())).thenThrow(RuntimeException(errorMessage))
 
         // When
-        viewModel.saveData(authResult)
+        viewModel.saveData(authResult.user!!)
 
         // Then
-        verify(repo).saveUserInfo(authResult)
+        verify(repo).saveUserInfo(authResult.user!!)
         assertEquals(false, viewModel.isLoading.value)
         assertEquals(errorMessage, viewModel.errorState.value)
     }
@@ -198,7 +198,7 @@ class LoginSignUpViewModelTest {
     @Test
     fun `getUserInfo success`() = runTest {
         // Given
-        val userInfo = UserInfo("test@gmail.com") // Mocked user info object
+        val userInfo = UserInfo("test@gmail.com", "test", "test", "test") // Mocked user info object
         whenever(repo.fetchUserInfo()).thenReturn(userInfo)
 
         // When
@@ -223,8 +223,6 @@ class LoginSignUpViewModelTest {
         verify(repo).fetchUserInfo()
         assertEquals(errorMessage, viewModel.errorState.value)
     }
-
-
 
 }
 

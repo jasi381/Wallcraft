@@ -5,7 +5,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.jasmeet.wallcraft.view.theme.poppins
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
@@ -47,11 +46,11 @@ fun SearchBar(
         onValueChange = { onValueChange.invoke(it) },
         shape = shape,
         modifier = modifier,
-        colors = TextFieldDefaults.textFieldColors(
+        colors = TextFieldDefaults.colors(
             cursorColor = MaterialTheme.colorScheme.onBackground.copy(0.7f),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            containerColor = MaterialTheme.colorScheme.surface.copy(0.7f)
+            focusedContainerColor = MaterialTheme.colorScheme.surface.copy(0.7f)
         ),
         trailingIcon = {
             Row {

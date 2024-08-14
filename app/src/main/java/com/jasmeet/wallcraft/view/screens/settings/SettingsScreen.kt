@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -108,8 +109,6 @@ fun SharedTransitionScope.SettingsScreen(
     val currentTheme by rememberUpdatedState(theme)
 
 
-
-
     LaunchedEffect(true) {
         loginSignUpViewModel.getUserInfo()
     }
@@ -147,8 +146,8 @@ fun SharedTransitionScope.SettingsScreen(
             item {
                 ThreeDBlinkingBorderImage(
                     painter = painter,
-                    modifier = Modifier.size(100.dp),
-                    borderWidth = 5.dp
+                    modifier = Modifier.size(90.dp),
+                    borderWidth = 4.dp
                 )
             }
             item { Spacer(modifier = Modifier.height(12.dp)) }
@@ -157,7 +156,7 @@ fun SharedTransitionScope.SettingsScreen(
                     text = userInfo?.name ?: "Loading",
                     fontWeight = FontWeight.Bold,
                     fontFamily = poppins,
-                    textSize = 20.sp,
+                    textSize = 16.sp,
                     textColor = MaterialTheme.colorScheme.onBackground
                 )
                 TextComponent(
@@ -325,7 +324,7 @@ fun SharedTransitionScope.SettingsScreen(
                     }
                 }
             }
-            item { Spacer(modifier = Modifier.height(10.dp)) }
+            item { Spacer(modifier = Modifier.height(25.dp)) }
 
             item {
                 LoadingButton(
@@ -364,7 +363,7 @@ fun SharedTransitionScope.SettingsScreen(
             onDismiss = {
                 showLogoutDialog.value = false
             },
-            title = "Are u sure you want to logout?",
+            title = "Are you sure you want to Log Out?",
         )
     }
 
@@ -485,8 +484,8 @@ fun CustomConfirmationDialog(
             ) {
                 Text(
                     text = title,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
                     fontFamily = poppins,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -497,7 +496,11 @@ fun CustomConfirmationDialog(
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
-                        shape = MaterialTheme.shapes.small
+                        shape = MaterialTheme.shapes.small,
+                        border = BorderStroke(
+                            0.5.dp,
+                            MaterialTheme.colorScheme.onBackground.copy(0.5f)
+                        )
                     ) {
                         Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
                     }
