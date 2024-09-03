@@ -12,7 +12,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("C:\\Users\\User\\StudioProjects\\Wallcraft\\keyStore.jks")
+            storeFile = file("/Users/jasmeetsingh/AndroidStudioProjects/Wallcraft/keyStore.jks")
             storePassword = "jasmeet34"
             keyAlias = "release"
             keyPassword = "jasmeet34"
@@ -43,6 +43,8 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
+            isShrinkResources = true
+            isCrunchPngs = true
         }
     }
     compileOptions {

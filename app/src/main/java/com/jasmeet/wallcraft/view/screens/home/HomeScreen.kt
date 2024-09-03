@@ -7,6 +7,11 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -53,6 +58,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
@@ -209,92 +217,104 @@ fun SharedTransitionScope.HomeScreen(
                             if (index < data.itemCount) {
                                 val item = data[index]
 
+                                if (item != null) {
 
-                                val encodedUrl =
-                                    URLEncoder.encode(item?.urls?.regular, "UTF-8")
-                                val encodedLowQuality =
-                                    URLEncoder.encode(item?.urls?.small, "UTF-8")
 
-                                AsyncImage(
-                                    model = ImageRequest.Builder(context)
-                                        .data(item?.urls?.full.toString())
-                                        .crossfade(true)
-                                        .build(),
-                                    placeholder = painterResource(id = R.drawable.img_placeholder),
-                                    contentScale = ContentScale.FillBounds,
-                                    contentDescription = item?.altDescription,
-                                    modifier = Modifier
-                                        .sharedElement(
-                                            state = rememberSharedContentState(
-                                                key = "image-${item?.urls?.regular}"
-                                            ),
-                                            animatedVisibilityScope = animatedVisibilityScope,
-                                            boundsTransform = { _, _ ->
-                                                tween(
-                                                    durationMillis = 800,
-                                                    easing = CubicBezierEasing(
-                                                        0.5f,
-                                                        0.75f,
-                                                        0.1f,
-                                                        0.85f
+                                    val encodedUrl =
+                                        URLEncoder.encode(item.urls.regular, "UTF-8")
+                                    val encodedLowQuality =
+                                        URLEncoder.encode(item.urls.small, "UTF-8")
+
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(context)
+                                            .data(item.urls.full.toString())
+                                            .crossfade(true)
+                                            .build(),
+                                        placeholder = painterResource(id = R.drawable.img_placeholder),
+                                        contentScale = ContentScale.FillBounds,
+                                        contentDescription = item.altDescription,
+                                        modifier = Modifier
+                                            .sharedElement(
+                                                state = rememberSharedContentState(
+                                                    key = "image-${item.urls.regular}"
+                                                ),
+                                                animatedVisibilityScope = animatedVisibilityScope,
+                                                boundsTransform = { _, _ ->
+                                                    tween(
+                                                        durationMillis = 800,
+                                                        easing = CubicBezierEasing(
+                                                            0.5f,
+                                                            0.75f,
+                                                            0.1f,
+                                                            0.85f
+                                                        )
                                                     )
-                                                )
 
-                                            }
-                                        )
-                                        .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
-                                        .clip(MaterialTheme.shapes.large)
-                                        .pointerInput(Unit) {
-                                            awaitEachGesture {
-                                                val down = awaitFirstDown(requireUnconsumed = false)
-                                                val downTime = System.currentTimeMillis()
-
-                                                var holdJob: Job? = null
-                                                holdJob = scope.launch {
-                                                    delay(300) // Adjust this delay as needed
-                                                    isHolding = true
-                                                    selectedImageUrl = item?.urls?.regular
-                                                    showInfoDialog = true
-                                                    Log.d("Gesture", "Hold started")
                                                 }
+                                            )
+                                            .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
+                                            .clip(MaterialTheme.shapes.large)
+                                            .pointerInput(Unit) {
+                                                awaitEachGesture {
+                                                    val down =
+                                                        awaitFirstDown(requireUnconsumed = false)
+                                                    val downTime = System.currentTimeMillis()
 
-                                                val up = waitForUpOrCancellation()
-                                                holdJob.cancel()
-
-                                                when (up) {
-                                                    null -> {
-                                                        // The gesture was cancelled
-                                                        isHolding = false
-                                                        showInfoDialog = false
-                                                        Log.d("Gesture", "Gesture cancelled")
+                                                    var holdJob: Job? = null
+                                                    holdJob = scope.launch {
+                                                        delay(300) // Adjust this delay as needed
+                                                        isHolding = true
+                                                        selectedImageUrl = item.urls.regular
+                                                        showInfoDialog = true
+                                                        Log.d("Gesture", "Hold started")
                                                     }
 
-                                                    else -> {
-                                                        val upTime = System.currentTimeMillis()
-                                                        if (isHolding) {
-                                                            // Release after hold
+                                                    val up = waitForUpOrCancellation()
+                                                    holdJob.cancel()
+
+                                                    when (up) {
+                                                        null -> {
+                                                            // The gesture was cancelled
                                                             isHolding = false
                                                             showInfoDialog = false
-                                                            Log.d("Gesture", "Hold released")
+                                                            Log.d("Gesture", "Gesture cancelled")
+                                                        }
 
-                                                        } else if (upTime - downTime < 300) {
-                                                            // This was a quick tap
-                                                            Log.d("Gesture", "Item clicked")
-                                                            onImageClicked(
-                                                                Triple(
-                                                                    encodedUrl,
-                                                                    item?.id.toString(),
-                                                                    encodedLowQuality
+                                                        else -> {
+                                                            val upTime = System.currentTimeMillis()
+                                                            if (isHolding) {
+                                                                // Release after hold
+                                                                isHolding = false
+                                                                showInfoDialog = false
+                                                                Log.d("Gesture", "Hold released")
+
+                                                            } else if (upTime - downTime < 300) {
+                                                                // This was a quick tap
+                                                                Log.d("Gesture", "Item clicked")
+                                                                onImageClicked(
+                                                                    Triple(
+                                                                        encodedUrl,
+                                                                        item.id.toString(),
+                                                                        encodedLowQuality
+                                                                    )
                                                                 )
-                                                            )
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
 
-                                        .weight(1f)
-                                )
+                                            .weight(1f)
+                                    )
+                                }
+                                else {
+                                    // Render shimmer effect for loading state
+                                    ShimmerItem(
+                                        modifier = Modifier
+                                            .height(LocalConfiguration.current.screenHeightDp.dp * 2 / 6f)
+                                            .weight(1f)
+                                    )
+                                }
                             }
                         }
                     }
@@ -432,6 +452,64 @@ fun SharedTransitionScope.HomeScreen(
 
 }
 
+@Composable
+fun ShimmerItem(modifier: Modifier = Modifier) {
+    ShimmerEffect(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+    )
+}
+
+@Composable
+fun ShimmerEffect(
+    modifier: Modifier,
+    widthOfShadowBrush: Int = 500,
+    angleOfAxisY: Float = 270f,
+    durationMillis: Int = 1000,
+) {
+
+
+    val shimmerColors = listOf(
+        Color.White.copy(alpha = 0.3f),
+        Color.White.copy(alpha = 0.5f),
+        Color.White.copy(alpha = 1.0f),
+        Color.White.copy(alpha = 0.5f),
+        Color.White.copy(alpha = 0.3f),
+    )
+
+    val transition = rememberInfiniteTransition(label = "")
+
+    val translateAnimation = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = (durationMillis + widthOfShadowBrush).toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = durationMillis,
+                easing = LinearEasing,
+            ),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "Shimmer loading animation",
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset(x = translateAnimation.value - widthOfShadowBrush, y = 0.0f),
+        end = Offset(x = translateAnimation.value, y = angleOfAxisY),
+    )
+
+    Box(
+        modifier = modifier
+    ) {
+        Spacer(
+            modifier = Modifier
+                .matchParentSize()
+                .background(brush)
+        )
+    }
+
+
+}
 
 
 
